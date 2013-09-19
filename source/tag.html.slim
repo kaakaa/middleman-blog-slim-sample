@@ -1,0 +1,11 @@
+---
+pageable: true
+per_page: 10
+---
+
+h1 Articles tagged '#{tagname}'
+
+- page_articles.each do |article|
+  li
+    == link_to article.title, article
+    date= article.date.strftime(', written on %B %e, %Y')
