@@ -15,6 +15,8 @@ Slim::Engine.set_default_options :shortcut => {
   '&' => {:tag => 'input', :attr => 'type'}
 }
 
+activate :livereload
+
 activate :blog do |blog|
   # blog.prefix = "blog"
   blog.permalink = ":year/:month/:day/:title.html"
