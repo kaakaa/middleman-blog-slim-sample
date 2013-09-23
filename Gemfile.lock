@@ -17,14 +17,17 @@ GEM
     em-websocket (0.5.0)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.5.3)
+    eventmachine (1.0.3)
     eventmachine (1.0.3-x86-mingw32)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    ffi (1.9.0)
     ffi (1.9.0-x86-mingw32)
     fssm (0.2.10)
     haml (4.0.3)
       tilt
     hike (1.2.3)
+    http_parser.rb (0.5.3)
     http_parser.rb (0.5.3-x86-mingw32)
     i18n (0.6.5)
     kramdown (1.1.0)
@@ -103,6 +106,7 @@ GEM
     wdm (0.1.0)
 
 PLATFORMS
+  ruby
   x86-mingw32
 
 DEPENDENCIES

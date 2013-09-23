@@ -11,4 +11,6 @@ gem "builder", "~> 3.0"
 
 gem "slim"
 
-gem "wdm"
+platforms :mswin do
+  gem "wdm", :group => [:development, :test]
+end
