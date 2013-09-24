@@ -75,32 +75,18 @@ html
           - blog.articles[0..10].each do |article|
             li
               == link_to article.title , article
-        h5 Tags
-        ul.alt
-          - blog.tags.each do |tag, articles|
-            li
-              == link_to tag, tag_path(tag)
-              = "(#{articles.size})"
         h5 By Year
         ul.alt
           - blog.articles.group_by {|a| a.date.year}.each do |year, articles|
             li
               == link_to year, blog_year_path(year)
               = "(#{articles.size})"
-        h5 Icon List
-        ul.icon
-          li
-            i.icon-ok
-            | Apple
-          li
-            i.icon-ok
-            | Banana
-          li
-            i.icon-ok
-            | Orange
-          li
-            i.icon-ok
-            | pear
+        h5 Tags
+        ul.alt
+          - blog.tags.each do |tag, articles|
+            li
+              == link_to tag, tag_path(tag)
+              = "(#{articles.size})"
 
         span class="icon social x-large darkgray" data-icon="i"
         span class="icon social x-large black" data-icon="w"
