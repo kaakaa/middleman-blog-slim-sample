@@ -12,64 +12,21 @@ html
     link rel="stylesheet" type="text/css" href="style.css" media="all"
     script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"
     script type="text/javasript" src="javascript/kickstart.js"
-  body.elements
-    nav.navbar
-      ul
-        li
-          a href="" 
-            | Item 1
-        li
-          a href=""
-            | Item 2
-        li
-          a href=""
-            span.icon data-icon="R"
-            | Item 3
-          ul
-            li
-              a href=""
-                span.icon data-icon="G"
-                | SubItem
-            li
-              span.icon data-icon="X"
-              | Sub Item
-        li
-          a href=""
-            | Item 4
-    .callout.callout-top.clearfix
+  body
+    .callout.clearfix
       h1 
         | hoge
     .grid
 
     .col_12
-      .col_6
-        == yield
       .col_1
-      .col_2
-        h5 Profile
-        img.full-width src="http://placehold.it/260x200/4D99E0/ffffff.png&text=full+width"
-        p
-          | lived in Yokohama
-        p
-          | Software Engineer
-        p
-          | Java/Groovy/Ruby/Sinatra/Trac/Jenkins
-        h5 Socials
-        p
-          a href="#"
-            i class="icon-twitter-sign icon-2x"
-          a href="#"
-            i class="icon-facebook-sign icon-2x"
-          a href="#"
-            i class="icon-linkedin-sign icon-2x"
-          a href="#"
-            i class="icon-github-sign icon-2x"
-        p
-          a class="button orange small" href="#"
-            i.icon-rss
-            | RSS
-
+      .col_7
+        == yield
       .col_3
+        h4 Profile
+        img.align-right src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width"
+        p
+          | live in Yokohama. Software Engineer. Java / Groovy / Ruby / Sinatra / Trac / Jenkins
         h5 Recent Articles
         ul.alt
           - blog.articles[0..10].each do |article|
@@ -92,6 +49,21 @@ html
         span class="icon social x-large black" data-icon="w"
         span class="icon x-large pink" data-icon="*"
         span class="icon social x-large green" data-icon="v"
+
+        h5 Socials
+        p
+          a href="#"
+            i class="icon-twitter-sign icon-2x"
+          a href="#"
+            i class="icon-facebook-sign icon-2x"
+          a href="#"
+            i class="icon-linkedin-sign icon-2x"
+          a href="#"
+            i class="icon-github-sign icon-2x"
+        p
+          a class="button orange small" href="#"
+            i.icon-rss
+            | RSS
 
         a.twitter-timeline href="https://twitter.com/kaakaa_hoe_prog" data-widget-id="382868831212810240"
           | @kaakaa_hoe_prog からのツイート
