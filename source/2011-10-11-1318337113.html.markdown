@@ -1,0 +1,38 @@
+---
+title:  Ubuntuではじめる「７つの言語　７つの世界」
+date: 2011-10-11
+tags: Ubuntu
+---
+[Ubuntuではじめる「７つの言語　７つの世界」](http://blog.udzura.jp/2011/09/17/start-7languages-7weeks-with-ubuntu/)
+
+[![７つの言語
+７つの世界](http://ecx.images-amazon.com/images/I/51RCHbILAFL._SL160_.jpg "７つの言語 ７つの世界")](http://www.amazon.co.jp/dp/4274068579/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+[７つの言語
+７つの世界](http://www.amazon.co.jp/dp/4274068579/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+-   作者: [Bruce A.
+    Tate](http://d.hatena.ne.jp/keyword/Bruce%20A%2E%20Tate),[まつもとゆきひろ](http://d.hatena.ne.jp/keyword/%A4%DE%A4%C4%A4%E2%A4%C8%A4%E6%A4%AD%A4%D2%A4%ED),[田和勝](http://d.hatena.ne.jp/keyword/%C5%C4%CF%C2%BE%A1)
+-   出版社/メーカー:
+    [オーム社](http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%E0%BC%D2)
+-   発売日: 2011/07/23
+-   メディア: 単行本（ソフトカバー）
+-   購入: 9人 クリック: 230回
+-   [この商品を含むブログ (57件)
+    を見る](http://d.hatena.ne.jp/asin/4274068579)
+
+Ubuntu全然触ってないんで、これで勉強していこうかと。
+
+早速、Ubuntuにインストールしてみようとしたら、サイトに載ってるapptitudeという命令が使えないとのこと。
+
+サイトの作者さんはどこかでapptitudeという命令を作っていたのだろうか…。
+
+とりあえずapptitude→apt-getとすることで問題なくインストールできた模様。
+
+導入をちょこっと読んでみた印象は、他の言語との比較による各言語の特徴やその言語が開発された理由などをしっかりと学べそうな印象。
+
+結構期待してる。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

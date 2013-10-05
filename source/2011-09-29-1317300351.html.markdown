@@ -1,0 +1,16 @@
+---
+title:  DIContainer勉強中
+date: 2011-09-29
+tags: Java
+---
+会社で仕事が無さ過ぎて、今週は勉強週間となりました。
+
+という訳でDIContainer学習のためにSpring FrameworkとSeasar2触ってる。
+
+DIContainerはインスタンスを作る際に外部からプロパティを設定できますよって程度の認識。
+
+まぁ、それだけ覚えておけば今は十分でしょう。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

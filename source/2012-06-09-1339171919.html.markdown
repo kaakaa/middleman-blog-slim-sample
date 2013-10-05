@@ -1,0 +1,136 @@
+---
+title:  groovyでシーザー暗号問題組んでみた
+date: 2012-06-09
+tags: groovy
+---
+groovyのチュートリアル見ながら遊んでたら、ちょっと思いついたのでやってみた。
+
+~~~~ {.syntax-highlight}
+alphabets = "abcdefghijklmnopqrstuvwxyz"
+alphabetMap = [:]
+(0..alphabets.length()-1).each{ alphabetMap[alphabets[it]] = it }
+
+println alphabetMap
+~~~~
+
+結果はこちら。
+
+    [a:0, b:1, c:2, d:3, e:4, f:5, g:6, h:7, i:8, j:9, k:10, l:11, m:12, n:13, o:14, p:15, q:16, r:17, s:18, t:19, u:20, v:21, w:22, x:23, y:24, z:25]
+
+うん、クロージャー便利。
+
+\
+
+んで、これを元にシーザー暗号問題組んでみた。
+
+[Caesar暗号解読](http://vipprog.net/wiki/exercise.html#h54a0395)
+
+\
+
+先に言い訳。
+
+組み終わって何回か動かしてたら、
+
+    org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:
+    /Users/****/Documents/groovy-1.8.6/sample.groovy: 32: unexpected token: } @ line 32, column 1.
+       }
+       ^
+
+    1 error
+
+ってなエラーが出た。
+
+グーグル先生に聞いてみると日本語がいけないんだってさ。
+
+[Literal Ice: Grails + easyb
+でイミフなエラー(MultipleCompilationErrorsException)が出る件](http://blog.monochromeroad.com/2009/11/grails-easyb-multiplecompilationerrorse.html)
+
+コメント日本語で書いてたので、それを英語にするハメに…。英語できないんで酷いコメントになってます。という言い訳。
+
+\
+
+~~~~ {.syntax-highlight}
+message = "qdq-gi.q-a ziatmxxitmdqibtqi-ustbi ri.qmoqrcxi.qbubu zir -ibtqi-qp-qaai ripmymsqkir -ibtqi-qy dmxi ri.cnxuoi rruoumxakir -ibtqiqzmobyqzbkii-q.qmxi -imyqzpyqzbi rixmeaki -puzmzoqai -i-qscxmbu zaimzpir -i btq-iymbbq-a;iz -iatmxximzgi.q-a zinqiuzimzgiemgipuao-uyuzmbqpimsmuzabir -ia. za -uzsiacotiimi.qbubu zj"
+
+alphabets = "abcdefghijklmnopqrstuvwxyz .,-"
+alphabetsDouble = alphabets + alphabets
+
+alphabetMap = [:]
+(0..alphabets.length()-1).each{ alphabetMap[alphabetsDouble[it]] = it }
+
+// return shifted message
+def shift(shiftSize){
+    // calculate shiftSize modulo alphabets.length()
+    shiftSize = shiftSize % alphabets.size()
+
+    shiftedString = ""
+    // message shift closure 
+    shiftClosure = { 
+        if(message[it]==';'){
+            shiftedString += ';'
+        } else {
+            shiftedString += alphabetsDouble[alphabetMap[message[it]]+shiftSize]
+        }
+    }
+    (0..message.length()-1).each(shiftClosure)
+
+    return shiftedString
+}
+
+// find string 'person'
+def findPerson(line){
+    return line ==~ /.*person.*/
+}
+
+// Decrypt cipher
+def decrypt(){
+    for(i in 0..alphabets.length()-1){
+        shiftedMessage = shift(i)
+        if(findPerson(shiftedMessage))
+            return shiftedMessage
+    }
+}
+println decrypt()
+~~~~
+
+結果。
+
+    every person shall have the right of peaceful petition for the redress of damage, for the removal of public officials, for the enactment,  repeal or amendment of laws, ordinances or regulations and for other matters; nor shall any person be in any way discriminated against for sponsoring such  a petition.
+
+最初は文字列シフトさせる時に、messageのサイズでfor文回す方法ではなく、message.toCharArray().each(～)でやろうとしてた。でも、なんかエラーで出来ないみたい。
+
+    Caught: groovy.lang.MissingMethodException: No signature of method: java.lang.String.getAt() is applicable for argument types: (java.lang.Character) values: [q]
+    Possible solutions: getAt(groovy.lang.Range), getAt(java.util.Collection), getAt(int), getAt(groovy.lang.EmptyRange), getAt(java.util.Collection), getAt(groovy.lang.EmptyRange)
+    groovy.lang.MissingMethodException: No signature of method: java.lang.String.getAt() is applicable for argument types: (java.lang.Character) values: [q]
+    Possible solutions: getAt(groovy.lang.Range), getAt(java.util.Collection), getAt(int), getAt(groovy.lang.EmptyRange), getAt(java.util.Collection), getAt(groovy.lang.EmptyRange)
+        at sample$_shift_closure2.doCall(sample.groovy:17)
+        at sample.shift(sample.groovy:24)
+        at sample$shift.callCurrent(Unknown Source)
+        at sample.decrypt(sample.groovy:38)
+        at sample.run(sample.groovy:43)
+
+出来たとしても大して綺麗になるわけでもないので、まぁいっか。
+
+\
+
+反省点としてはshiftClosureはもっと簡単にできそう。特に、else文当たりはゴリ押しすぎるなぁ。クロージャーもっと使ったり読んだりしないと。
+
+でも、groovyでは正規表現が使いやすいのはすごく助かる。JavaだとPatternとMatcher用意して、find()でif文かけて…とか面倒だからな。
+
+\
+
+これだけで２時間ぐらいかかってしまった。まぁとりあえず、初クロージャーには良い問題でした。
+
+\
+
+groovyはホントにjava屋さんの軽量言語の入り口として優秀だと思う。基本型に対するメソッドとか調べなくても書けるし。
+
+groobyまだまだ遊べそう。
+
+\
+
+さてさて、これでゆっくりユーロ開幕戦見れる。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

@@ -1,0 +1,18 @@
+---
+title: この前作ったSinatraアンテナをちょっと改良
+date: 2013-03-31
+tags: Ruby,Sinatra
+---
+[kaakaa/SinatraSample · GitHub](https://github.com/kaakaa/SinatraSample)
+
+Twitter Bootstrap使って軽く、本当に軽く装飾した。
+
+あと、更新日付とかも表示するようにした。
+
+HerokuとかAWSにデプロイしてサンプルを見れるようにする方が良い気がしてる。
+
+サンプル見せるほどのアレでもないんだけど。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

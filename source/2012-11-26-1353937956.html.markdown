@@ -1,0 +1,81 @@
+---
+title:  指定時刻内のみで動作するタスク
+date: 2012-11-26
+tags: Gradle
+---
+最近、セールで買ったコイツを読み進めてる。
+
+[![Gradle Effective Implementation
+Guide](http://ecx.images-amazon.com/images/I/51yS1e9PhlL._SL160_.jpg "Gradle Effective Implementation Guide")](http://www.amazon.co.jp/dp/1849518106/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+[Gradle Effective Implementation
+Guide](http://www.amazon.co.jp/dp/1849518106/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+-   作者: [Hubert Klein
+    Ikkink](http://d.hatena.ne.jp/keyword/Hubert%20Klein%20Ikkink)
+-   出版社/メーカー: [Packt
+    Publishing](http://d.hatena.ne.jp/keyword/Packt%20Publishing)
+-   発売日: 2012/10/15
+-   メディア: ペーパーバック
+-   クリック: 1回
+-   [この商品を含むブログ (1件)
+    を見る](http://d.hatena.ne.jp/asin/1849518106)
+
+\
+
+その中で、面白そうなコードがあったので紹介。
+
+build.gradle
+
+~~~~ {.syntax-highlight}
+def printTaskName = { task ->
+        println "Running ${task.name}"
+}
+
+task first << printTaskName
+
+first.doFirst{
+        def today = Calendar.instance
+        def workingHours = today[Calendar.HOUR_OF_DAY] in 8..17
+
+        if(workingHours) {
+                throw new StopExecutionException()
+        }
+}
+
+task second(dependsOn: 'first') << printTaskName
+~~~~
+
+\
+
+こいつを
+
+    gradle second
+
+で実行すると、実行した時の時刻が8～17時の間であれば、firstタスクが実行中にStopExecutionExceptionがthrowされて、firstタスクの実行が中止される。（secondタスクは実行される）
+
+\
+
+マシンリソースを食うタスクを業務時間中に実行せず、ナイトリービルドの際だけに実行されるようにしたい時とかに使えそう。
+
+\
+
+StopExecutionExceptionを投げる以外にもタスクを実行しないようにする方法は色々あるみたい。
+
+-   StopExecutionExceptionを投げる
+-   taskが持っているonlyIfメソッドを使う
+-   gradleコマンドの-xオプションで実行したくないタスクを指定する
+-   taskのinputs/outputsプロパティを指定し、inputs/outputsプロパティに指定されたファイル群に更新が無い場合にタスクをスキップする
+-   taskの持つenabledプロパティをfalseにする
+
+\
+
+ありすぎだろ。
+
+\
+
+Gradle面白そうだから実際のプロジェクトでも使ってみたいな～
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

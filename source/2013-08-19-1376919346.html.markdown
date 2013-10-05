@@ -1,0 +1,16 @@
+---
+title:  社内勉強会 - 書籍管理Webシステム
+date: 2013-08-19
+tags: sinatra
+---
+シコシコ作ってたWebシステムについての紹介。
+
+初めてのWebシステムなので、中身はグダグダです。
+
+**[社内勉強会 -
+書籍管理Webシステム](https://www.slideshare.net/nemotoyusuke16/library-slideshare "社内勉強会 - 書籍管理Webシステム")**
+from **[Nemoto Yusuke](http://www.slideshare.net/nemotoyusuke16)**
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

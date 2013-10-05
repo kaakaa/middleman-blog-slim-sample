@@ -1,0 +1,6 @@
+---
+title:  GroovyでHTTPBuilderをGrabしようとしたらエラー
+date: 2012-08-24
+tags: groovy
+---
+

@@ -1,0 +1,164 @@
+---
+title:  Jenkinsプラグイン開発　Notifier拡張のプラグインを作る　その１
+date: 2012-07-01
+tags: Jenkins
+---
+Jenkinsプラグイン拡張を勉強中。
+
+うちの組織では「ソースコードの規模に対して◯件エラーが出るはずだ」という指標値があります。
+
+予め指標値を入力しておけば、ステップカウンターで測定したステップ数を元に自動的に目標エラー件数を計算して表示してくれるプラグインを作っていきたいと思います。
+
+「対ステップ数のエラー件数指標値なんて何の意味があるのか」という異論・反論は受け付けません。
+
+\
+ \
+
+まずは、Jenkinsの公式などを参考にHelloWorldBuilderプラグインを生成。
+
+[Plugin tutorial - 日本語 - Jenkins
+Wiki](https://wiki.jenkins-ci.org/display/JA/Plugin+tutorial)
+
+今回プラグイン名などは以下のようにしました。
+
+groupId : my.plugin
+
+artifactId : MyPlugin
+
+\
+
+出来上がったプラグインのsrcディレクトリ配下は以下の様な構成になっているはずです。
+
+    src
+    ┗main
+    　┣java
+      ┃┗my
+      ┃　┗plugin
+      ┃　　┗HelloWorldBuilder.java   
+      ┗resources
+    　　┣index.jelly
+    　　┗my
+    　　　┗plugin
+    　　　　┗HelloWorldBuilder
+    　　　　　┣config.jelly
+    　　　　　┣global.jelly
+    　　　　　┣help-name.html
+    　　　　　┗help-useFrench.html
+
+\
+
+HelloWorldBuilderプラグインの処理を記述してあるのが、HelloWorldBuilder.java。
+
+コンフィグ画面を記述しているのがresources以下のHelloWorldBuilderディレクトリにあるjellyファイル達です。
+
+config.jellyとglobal.jellyの２ファイルがあります。
+
+Jenkinsトップ→「Jenkinsの管理」→「システムの設定」の設定画面でのコンフィグ画面を記述するのがglobal.jelly。
+
+各ジョブ画面→「設定」の設定画面でのコンフィグ画面を記述するのがconfig.jelly。
+
+今回global.jellyファイルはいじりません。
+
+\
+
+さて、HelloWorldBuilder.javaはhudson.tasks.Builderクラスを継承したクラスになっています。
+
+これはHelloWorldBuilderプラグインがジョブのビルド時に動作するプラグインであるということです。
+
+なので、HelloWorldBuilderプラグインの設定項目は「ビルド」セクションで選べるようになっています。
+
+画像の"Say Hello World"がHelloWorldBuilderプラグインの設定項目です。
+
+[![f:id:kaakaa\_hoe:20120701154526p:image](http://cdn-ak.f.st-hatena.com/images/fotolife/k/kaakaa_hoe/20120701/20120701154526.png "f:id:kaakaa_hoe:20120701154526p:image")](http://f.hatena.ne.jp/kaakaa_hoe/20120701154526)
+
+今回作りたいプラグインは、ビルドによって生成されるStepcounterの出力ファイルを利用するため、設定項目は「ビルド後の処理」セクションで選べるようになって欲しいはずです。
+
+そのためには、hudson.tasks.Notifierクラスを継承したクラスを作成すれば良いです。
+
+hudson.tasks.Notifierクラスを継承したクラスの設定項目は「ビルド後の処理」セクションの設定項目として現れます。
+
+そこで、Notifierクラスを継承したCalculatorTestIndexValueクラスを作成します。
+
+CalculatorTestIndexValue.java
+
+~~~~ {.syntax-highlight}
+package my.plugin;
+
+import hudson.Extension;
+import hudson.model.AbstractProject;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
+import hudson.tasks.Publisher;
+
+public class CalcuratorTestIndexValue extends Notifier {
+
+    public BuildStepMonitor getRequiredMonitorService() {
+        return null;
+    }
+
+    @Extension
+    public static final class DescriptorImpl extends
+            BuildStepDescriptor<Publisher> {
+
+        private String jenkinsUserName;
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return true;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Calc Test Index Value";
+        }
+    }
+
+}
+~~~~
+
+ここで、内部クラスDesciptorImplを作成していますが、DescriptorImplクラスのgetDisplayNameメソッドを作成しないと、プラグインの設定項目が出て来ません。
+
+上記のようにCalcuratorTestIndexValue.javaを作成することで、「ビルド後の処理」セクションに設定項目"Cals
+Test Index value"が出現します。
+
+[![f:id:kaakaa\_hoe:20120701155830p:image](http://cdn-ak.f.st-hatena.com/images/fotolife/k/kaakaa_hoe/20120701/20120701155830.png "f:id:kaakaa_hoe:20120701155830p:image")](http://f.hatena.ne.jp/kaakaa_hoe/20120701155830)
+
+設定項目にチェックボックスだったりテキストエリアを付けるには、resources配下にmy/plugin/CalcuratorTestIndexValueディレクトリを作って、その下にconfig.jellyを作成します。
+
+Jellyについてはもう少し勉強が必要なので割愛。
+
+ココらへんが参考になりそう。
+
+[Jelly form controls - Jenkins - Jenkins
+Wiki](https://wiki.jenkins-ci.org/display/JENKINS/Jelly+form+controls)
+
+[Hudson core - Jelly Taglib
+references](http://jenkins-ci.org/maven-site/hudson-core/jelly-taglib-ref.html)
+
+\
+
+設定についてはコレぐらいにして、次は処理について。
+
+先ほど作成したCalcuratorTestIndexValue.javaに処理を記述する訳ですが、このままでは動きません。
+
+performメソッドをオーバーライドし、そこに処理を記述していきます。
+
+~~~~ {.syntax-highlight}
+
+    @Override
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
+            BuildListener listener) throws InterruptedException, IOException {
+        return super.perform(build, launcher, listener);
+    }
+~~~~
+
+とりあえず、ココまで。
+
+びぼーろく
+
+-   build.getWorkspace()でジョブのパスを取得することが出来る。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

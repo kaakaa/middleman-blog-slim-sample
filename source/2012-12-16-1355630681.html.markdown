@@ -1,0 +1,59 @@
+---
+title:  Gradleでマルチプロジェクトビルド　その２
+date: 2012-12-16
+tags: Gradle
+---
+昨日の続きで、ちょっと気になったことを。
+
+Gradleでマルチプロジェクト組んだ時、そのプロジェクトをJenkinsでCIするときはどうなるんだろうって疑問。
+
+Gradleは自動で対象プロジェクトがマルチプロジェクトに含まれているかを確認してくれるけど、Eclipseで開発してる時とJenkinsに載せた時ってプロジェクト同士の相対パスが変わってしまう。
+
+ちょっと確認。
+
+    jobs/
+      sample1/
+        workspace/
+          build.gradle
+          settings.gradle
+      sample2/
+        workspace
+
+この時、sample1のbuild.gradleからsample2のwordspace内のソースが見たい。
+
+という時は、以下のようにsettings.gradleを書けば良いみたい。
+
+~~~~ {.syntax-highlight}
+includeFlat '../sample2/workspace'
+~~~~
+
+以下のビルドタスクをbuild.gradleに用意して確認。
+
+~~~~ {.syntax-highlight}
+allprojects{
+        task showRoot <<{
+                def file = file(new File('.'))
+                println "Root is ${file.path}"
+        }
+}
+~~~~
+
+showRootタスクを実行。
+
+    kaakaa_hoe@[workspace]$ gradle showRoot
+    :showRoot
+    Root is /Users/kaakaa_hoe/Documents/gradle-1.0/mysamples/EffectiveGradle/chapter7/jenkins/jobs/sample1/workspace
+    :../sample2/workspace:showRoot
+    Root is /Users/kaakaa_hoe/Documents/gradle-1.0/mysamples/EffectiveGradle/chapter7/jenkins/jobs/sample2/workspace
+
+    BUILD SUCCESSFUL
+
+    Total time: 2.977 secs
+
+includeFlatで宣言した後、フラットでないディレクトリを指定するのは気持ち悪いけど。
+
+なんかいい方法あったりするのかな。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

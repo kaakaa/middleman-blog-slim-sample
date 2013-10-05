@@ -1,0 +1,19 @@
+---
+title:  svnant
+date: 2011-09-30
+tags: Java, Ant
+---
+今日はsvnantに相当苦しめられた。
+
+\
+
+たぶん自分はバッチとかそういう単純な処理系が苦手。
+
+分からなくなるとどうしても考え込む方に向かってしまうんだよな…。
+
+とりあえず土日は会社から持って帰ってきたSubversionの本とTrac
+Lightning入れて勉強してみる。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

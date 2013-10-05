@@ -1,0 +1,30 @@
+---
+title:  IT勉強会カレンダーのイベントリストをpythonで取得したい(XML取得)
+date: 2012-02-14
+tags: python,Google Calendar
+---
+Data APIを読んでいたけど、全くわからん。
+
+トークン取得するとはどういうことなのか、パラメータに何を入れれば良いのか等々わからないことが多すぎて先に進まない。
+
+ということで他の方法を模索すると、あっけなく見つかりました。
+
+自分のGoogleカレンダーにＩＴ勉強会カレンダーインポートすれば、カレンダーの詳細見ることできるじゃん・・・。
+
+そこでXMLダウンロードのURLコピーして、pythonで普通に保存…。
+
+そこからフィードURLイジれば好きな日時のイベント取得できるんじゃないかなぁ。
+
+まーいちいちカレンダーインポートしなくてもできるでしょうねぇこれは。
+
+XMLのURL貼っておきます。
+
+公開カレンダーだから問題無いでしょう。
+
+    https://www.google.com/calendar/feeds/fvijvohm91uifvd9hratehf65k%40group.calendar.google.com/public/basic
+
+これで得たXMLを適当にパースしていきます。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

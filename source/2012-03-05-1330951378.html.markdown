@@ -1,0 +1,20 @@
+---
+title:  jinja2を触ってみる
+date: 2012-03-05
+tags: python,jinja2
+---
+テンプレートエンジン使えたるようになったら、いつか役に立ちそうな気がするのでpythonのテンプレートエンジン・jinja2を触ってみることにしました。
+
+ココらへん見ながらセットアップしましたよーってだけの日記。
+
+[Python Jinja2
+利用ノート](http://www.geocities.jp/showa_yojyo/note/python-jinja2.html)
+
+[http://nayuta.info/archives/67](http://nayuta.info/archives/67)
+nayuta.info » PythonのテンプレートエンジンJinja2の入れ方と簡単な使い方]
+
+loaderはFileSystemLoaderの方がわかりやすくて良い。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

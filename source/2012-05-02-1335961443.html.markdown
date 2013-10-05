@@ -1,0 +1,119 @@
+---
+title:  Macでプラグイン開発しようとすると文字化けする件について
+date: 2012-05-02
+tags: jenkins
+---
+[継続的インテグレーションツール Hudson のプラグインを作成 - なんとなくな
+Developer のメモ](http://d.hatena.ne.jp/fits/20080502/1209726765)
+
+ここに書いてあるファイルを作成してmvn
+packageすると文字化けでコンパイルエラー吐いてて、先に進めなかった。
+
+    [ERROR] COMPILATION ERROR : 
+    [INFO] -------------------------------------------------------------
+    [ERROR] /Users/kaakaa_hoe/Documents/jenkins_dev/simpleTest/src/main/java/simple/JavaNcssPublisher.java:[15,7] simple.JavaNcssPublisher ?? abstract ?łȂ??Ahudson.tasks.BuildStep ???? abstract ???\?b?h getRequiredMonitorService() ???I?[?o?[???C?h???܂???B
+    [ERROR] /Users/kaakaa_hoe/Documents/jenkins_dev/simpleTest/src/main/java/simple/JavaNcssPublisher.java:[38,12] ?V???{???????????܂???B
+    ?V???{??: ?N???X JavaNcssAction
+    ?ꏊ    : simple.JavaNcssPublisher ?? ?N???X
+    [ERROR] /Users/kaakaa_hoe/Documents/jenkins_dev/simpleTest/src/main/java/simple/JavaNcssPublisher.java:[38,37] ?V???{???????????܂???B
+    ?V???{??: ?N???X JavaNcssAction
+    ?ꏊ    : simple.JavaNcssPublisher ?? ?N???X
+
+保存する時の文字コード変えてみたり、pom.xmlに文字コード指定してみたりしたけど治らなかったが、この記事のように文字コード指定したら上手く行った。
+
+[MacでMaven使うと文字コードでハマったりとか -
+複雑系スパゲティソース(はてな版)](http://d.hatena.ne.jp/ikeike443/20120319/p1)
+
+ん～pom.xmlでの文字コード指定と、実行時にオプションで指定するのでは何が違うのかよく分からんが上手く行ったのでまーよしとする。
+
+\
+
+これで良しと思いきや、まだまだエラーが出たりする。
+
+    [INFO] Compiling 3 source files to /Users/kaakaa_hoe/Documents/jenkins_dev/simpleTest/target/classes
+    [INFO] -------------------------------------------------------------
+    [ERROR] COMPILATION ERROR : 
+    [INFO] -------------------------------------------------------------
+    [ERROR] /Users/kaakaa_hoe/Documents/jenkins_dev/simpleTest/src/main/java/simple/JavaNcssPublisher.java:[15,7] simple.JavaNcssPublisher は abstract でなく、hudson.tasks.BuildStep 内の abstract メソッド getRequiredMonitorService() をオーバーライドしません。
+    [INFO] 1 error
+
+これは元記事が古いせいですかね。
+
+APIを参考にして、JavaNcssPublisher.javaに以下のメソッド追加してやったら上手くいった。
+
+~~~~ {.syntax-highlight}
+public BuildStepMonitor getRequiredMonitorService(){
+    return BuildStepMonitor.BUILD;
+}
+~~~~
+
+[Builder (Jenkins main module 1.462
+API)](http://javadoc.jenkins-ci.org/hudson/tasks/Builder.html)
+
+んで、あとはサイトに書いてある通り。
+
+Maven使ってビルドするにはpom.xmlが必要。
+
+Mavenほとんど使ったこと無いから、以下のサイト参考に作った。
+
+groupIdとartifactIDとnameタグの所は適宜変更する。
+
+[mavenのレポートプラグインてんこ盛り設定 - Sacrificed &
+Exploited](http://d.hatena.ne.jp/cnaos/20100526/1274838431)
+
+~~~~ {.syntax-highlight}
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>model-ant-projec</groupId>
+  <artifactId>model-ant-project</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>maven-report-example</name>
+  
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Codehaus repository</id>
+            <url>http://repository.codehaus.org/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <properties>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javancss-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>
+~~~~
+
+こんな感じでプラグイン動かすことは出来た。
+
+でも、結果画面が見当たらないというオチ \^\^;
+
+調べてみる。
+
+\
+
+結果画面というより、先ずJavancss:reportで生成されるはずのファイルが生成されていなかったらしい。
+
+Jenkinsビルドのコンソール見てみると、こんな一行が。
+
+    [INFO] skip non existing resourceDirectory /Users/kaakaa_hoe/Documents/jenkins/SamplePlugin/work/jobs/sample/workspace/model-ant-project/src/test/resources
+
+src/test/resourcesが存在しないとか言われてるらしいので、src/test/resources配下にソースを突っ込んで実行してみたら、javancss-raw-reort.xmlが吐かれた。
+
+しかし、結果画面は出ない。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

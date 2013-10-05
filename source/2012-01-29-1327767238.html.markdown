@@ -1,0 +1,45 @@
+---
+title:  便利そうなアプリ
+date: 2012-01-29
+tags: mac
+---
+[http://ozpa-h4.com/2012/01/27/mac\_app\_login\_koumoku/:title=](http://ozpa-h4.com/2012/01/27/mac_app_login_koumoku/:title=)[Mac]私の生活に無くてはならないアプリ達。現在の「ログイン項目」に挙げているMacアプリまとめ
+| OZPAの表4]
+
+ここを参考にちょこちょこ入れてみる。
+
+とりあえず[ClipMenu: Mac OS X 用クリップボード管理ソフト -
+ClipMenu.com](http://www.clipmenu.com/ja/)は絶対。
+
+会社のPCにも入れてるけど、これがあるだけで作業効率段違い。
+
+これとMakeLinkはブログ書くエンジニアなら必須。
+
+\
+
+[Mac App Store - CLCL
+Lite](http://itunes.apple.com/jp/app/clcl-lite/id495511246?mt=12&ign-mpt=uo%3D4)はちょっと使ってみようかな。
+
+iTunesなんかは気分で立ち上げたりするから、ショートカットで起動できるのは便利そう。
+
+ブラウザは立ち上げっぱなしになるだろうから、割り当てなくていいか。
+
+\
+
+[ギークな見た目が超秀麗！！MacのデスクトップにiCalを表示するアプリ「Blotter」が便利でカッコイイ！
+|
+OZPAの表4](http://ozpa-h4.com/2011/12/02/blotter_ical_desktop_mac_app/)
+
+これはシェアウェアなので保留。
+
+[Reeder for Mac](http://reederapp.com/mac/)と一緒に買っちゃおうかな。
+
+\
+
+GrowlとBetterTouchToolは元から入ってました。
+
+BetterTouchToolは使いこなせたら便利そうだな。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

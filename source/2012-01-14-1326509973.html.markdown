@@ -1,0 +1,22 @@
+---
+title:  Macとubuntuのファイル共有
+date: 2012-01-14
+tags: mac,ubuntu
+---
+ubuntuのシステム設定からパーソナルファイル共有をONにしたんだけど、Macからは見えず。
+
+[Mac & ubuntu :
+コマンドを使わずにGUI操作のみでLinuxサーバーを構築（IPアドレスの固定とリモートデスクトップの設定）
+| Macとかの雑記帳](http://tukaikta.blog135.fc2.com/blog-entry-116.html)
+
+[Mac & ubuntu :
+コマンドを使わずにGUI操作のみでLinuxサーバーを構築（Sambaでファイル共有）
+| Macとかの雑記帳](http://tukaikta.blog135.fc2.com/blog-entry-117.html)
+
+ここらへんを参考に。
+
+Sambaで共有するときに、gufwでsambaを通すの忘れててちょっと混乱した。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

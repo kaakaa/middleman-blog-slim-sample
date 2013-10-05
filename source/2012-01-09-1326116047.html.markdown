@@ -1,0 +1,15 @@
+---
+title:  svn整理
+date: 2012-01-09
+tags: trac,svn
+---
+[Tracに既存のリポジトリを追加 |
+monoooki](http://monoooki.net/article/654)
+
+こことか参考にsvn整理。
+
+win機にTracLightning入ってたので、それ使ってリポジトリ管理していきます。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

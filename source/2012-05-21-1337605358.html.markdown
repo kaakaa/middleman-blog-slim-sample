@@ -1,0 +1,21 @@
+---
+title:  ローカルリポジトリが参照できてない？
+date: 2012-05-21
+tags: maven
+---
+Jenkinsプラグイン制作で躓き。
+
+他のプラグインをインポートしたコードを組んで、それをパッケージングしようとすると他のプラグインのパッケージが見つからないと言われる。
+
+[Mavenローカルリポジトリーメモ(Hishidama’s Apache Maven local repository
+Memo)](http://www.ne.jp/asahi/hishidama/home/tech/apache/maven/local.html)
+
+試行錯誤の末、こことか参考にして、どうやらローカルリポジトリーにインストール出来たみたい。
+
+んで、Jenkinsプロジェクトのpom.xmlに上記で入力した情報を使って依存性を指定したけど、パッケージが見つからないと言われたまま…。
+
+何事も上手くいかんなー
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

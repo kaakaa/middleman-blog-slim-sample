@@ -1,0 +1,22 @@
+---
+title:  リモートのRedmine DBにgroovyからアクセス
+date: 2012-09-23
+tags: Redmine, mysql
+---
+さっき書いてた記事が消えた…
+
+[http://akitosblog.seesaa.net/article/179631903.html:title=](http://akitosblog.seesaa.net/article/179631903.html:title=)[MySQL
+5.1] リモートマシンからのアクセスを許可する設定方法: Akito's IT技術
+メモ]
+
+[Groovy 1.8.3 で MySQL へ接続すると java.sql.SQLException が発生した -
+集中力なら売り切れたよ](http://d.hatena.ne.jp/r_ikeda/20111101/groovysql)
+
+ココらへんを参考に、リモートマシンからmysql
+DBにgroovyでアクセスできるようにしましたよって話。
+
+下書きにも残ってないのは萎えるな～
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

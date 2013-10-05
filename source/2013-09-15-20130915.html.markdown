@@ -1,0 +1,6 @@
+---
+title:  Sinatraアプリを定期的に実行するために泥臭く行ってみた
+date: 2013-09-15
+tags: Sinatra
+---
+

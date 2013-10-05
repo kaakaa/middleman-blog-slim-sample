@@ -1,0 +1,17 @@
+---
+title: Trac Lightningインストール
+date: 2011-09-30
+tags: 
+---
+すっげー簡単。
+
+\
+
+明日はココ見ながらポチポチしていきますか。
+
+[Win32 Trac
+Lightning](http://hondou.homedns.org/pukiwiki/pukiwiki.php?Win32%20Trac%20Lightning)
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

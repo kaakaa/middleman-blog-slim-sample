@@ -1,0 +1,17 @@
+---
+title:  みなとRuby会議01に参加してきました。
+date: 2012-06-03
+tags: ruby
+---
+[みなとRuby会議01 - Regional
+RubyKaigi](http://regional.rubykaigi.org/minato01)
+
+初めての勉強会参加。
+
+どんな雰囲気かわからず緊張していましたが、すごく和やかな雰囲気で居心地よかったです。
+
+あと、Mac率の高さにびっくり。他の勉強会もこんな感じなんですかね。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

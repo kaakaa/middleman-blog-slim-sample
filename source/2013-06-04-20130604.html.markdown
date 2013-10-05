@@ -1,0 +1,6 @@
+---
+title:  chefとvagrantを使って仮想環境上にJenkinsを立て
+date: 2013-06-04
+tags: chef,vagrant
+---
+

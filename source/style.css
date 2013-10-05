@@ -17,6 +17,10 @@ font-family: "Arimo", arial, verdana, sans-serif;
 font-weight:normal;
 }
 
+h2{
+font-size:2em;
+}
+
 thead th,
 tbody th{
 font-family: "Arimo", arial, verdana, sans-serif;

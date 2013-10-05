@@ -1,0 +1,58 @@
+---
+title:  IT勉強会カレンダーのイベントリストをpythonで取得したい（gdata導入編）
+date: 2012-02-10
+tags: python,Google Calendar
+---
+IT勉強会カレンダー自体は公開カレンダーなのでログインせずにデータ取得できるんじゃないかとおもってましたが、ダメなようですね。
+
+[Data API Developer’s Guide: Python - Google Calendar APIs and Tools -
+Google
+Code](http://code.google.com/intl/ja/apis/calendar/data/2.0/developers_guide_python.html#Auth)
+
+> The Python client library can be used to work with either public or
+> private feeds. However the Calendar Data API only provides access to
+> private feeds. That means your client application must send
+> authenticated requests to the API.
+
+\
+
+という訳で、一から勉強していきます。
+
+まずは環境設定から。
+
+[Getting Started with the Google Data Python Library - Google Data
+Protocol - Google
+Code](http://code.google.com/intl/ja/apis/gdata/articles/python_client_lib.html)
+
+うちのMacに入ってるのはpython2.7なので、Installing
+Dependenciesまでは読み飛ばして良さそう。2.5以上ならElementTreeはインストールする必要ないと。
+
+で、次のGoogle Data Python libraryは2.0.14を選択。
+
+難なくインストール完了…と思いきや、次のテスト実行で問題発生。
+
+    $ ./tests/run_data_tests.py
+    Traceback (most recent call last):
+      File "./tests/run_data_tests.py", line 9, in <module>
+        import gdata_test
+      File "/Users/kaakaa_hoe/Documents/pythonLib/gdata-2.0.14/tests/gdata_test.py", line 26, in <module>
+        import gdata
+
+gdataライブラリが見つからない、と。
+
+パスが通ってないだけだろうから簡単に修正できると思ってたけど、macのパス編集よくわからん。
+
+とりあえず、下記を参考に既にパスが通ってるsite-packagesディレクトリにgdata-2.0.14以下のatom、gdataフォルダを移動。
+
+[A-Liaison BLOG - Mac OS X
+LeopardでPYTHONPATHとPYTHONSTARTUPを設定してみました](http://akisute.com/2009/02/mac-os-x-leopardpythonpathpythonstartup.html)
+
+\
+
+動きました。
+
+とりあえず今日はここまで。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

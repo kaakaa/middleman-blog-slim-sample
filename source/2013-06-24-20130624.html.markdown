@@ -1,0 +1,6 @@
+---
+title:  社内勉強会 - chef
+date: 2013-06-24
+tags: chef
+---
+

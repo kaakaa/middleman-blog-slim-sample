@@ -1,0 +1,14 @@
+---
+title: インストール終了
+date: 2011-10-11
+tags: 
+---
+下のサイトのインストールは問題なく終了し、emacsの設定ファイルも落としきった…が、どう起動するのか分からない…。
+
+明日やろう。は馬鹿やろう。
+
+いや、明日やる。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

@@ -1,0 +1,14 @@
+---
+title: 無題
+date: 2011-09-29
+tags: 
+---
+久しぶりの更新。
+
+ubuntuは結局、新しくCD ROM買ってLive CD作ってインスコ。
+
+emacs使い倒そうとLisp本買ったものの放置中。駄目駄目ですねぇ…
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

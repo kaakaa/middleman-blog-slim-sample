@@ -1,0 +1,63 @@
+---
+title:  subclipseのアンインストール
+date: 2012-01-05
+tags: Eclipse
+---
+昨日出たsubclipseのjavaHlエラーについて調べてみたら、svnのバージョンとsubclipseのバージョンが違うのが理由だと言う説が。
+
+[Eclipse から Subversion を利用する - Subclipse |
+すぐに忘れる脳みそのためのメモ](http://jutememo.blogspot.com/2008/04/eclipse-subversion-subclipse.html)
+
+調べてみると
+
+svn:v1.6.16
+
+subclipse:v1.0.0
+
+ということで、subclipseを再インストールすることに。
+
+まず、アンインストール。
+
+いつも使ってるwin版eclipse3.2,3.4ではeclipseメニューの「Help」→「ソフトウェアの更新」を選択して、ごちゃごちゃやってた記憶があるんだけど、無い。3.7だから？というか、Macだからか？
+
+数分の探索の後、[Eclipse]-\>[About Eclipse]からInstallation
+Details行くとアンインストールできました。
+
+次は、Subclipse1.6.xのインストール。
+
+む。
+
+なんか以下から選択しなきゃいけない雰囲気。
+
+-   Core SVNKit Library
+-   Optional JNA Library
+-   Subclipse
+
+とりあえずSubclipse以下のみをインストールしてみる。
+
+\
+
+インストールは滞り無く完了。
+
+しかし、リポジトリを追加しようとするとunknown hostエラー。
+
+なんでだろうなー、と色々調べてると…おお…。
+
+[第3章
+リポジトリ](http://tortoisesvn.net/docs/release/TortoiseSVN_ja/tsvn-repository.html#tsvn-repository-local-share)
+
+ネットワークフォルダ上のリポジトリは推奨されないと…。
+
+繋がらない理由がこれが原因なのかは分からないけど、リポジトリにネットワークフォルダ使うのはやめておいた方が良さそうだな…。
+
+でも、今のmacはSSD128GBだから容量的にも心配だし、ネットワークの勉強にもなりそうだからネットワーク使ってリポジトリ管理したいんだよな…。
+
+オンラインストレージ使うのが良いのだろうかっ…。
+
+色々調べてみましょう。
+
+振り出しに戻った。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

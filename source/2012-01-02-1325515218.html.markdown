@@ -1,0 +1,13 @@
+---
+title:  Gitインストール
+date: 2012-01-02
+tags: Git
+---
+[Downloads - git-osx-installer - OSX Installer for Git - Google Project
+Hosting](http://code.google.com/p/git-osx-installer/downloads/list?can=3)からインストーラをダウンロードし、インストールする。
+
+おわり
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

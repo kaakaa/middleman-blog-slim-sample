@@ -1,0 +1,98 @@
+---
+title: ubuntuはじめ
+date: 2011-03-03
+tags: 
+---
+学生生活もほぼ終わり、社会人生活までの残り１ヶ月を利用して
+
+ubuntuをイジイジしようと思いました。
+
+まずはインストール。
+
+現在の最新版は10.10。
+
+[http://www.ubuntulinux.jp/News/ubuntu1010-desktop-ja-remix](http://www.ubuntulinux.jp/News/ubuntu1010-desktop-ja-remix)
+
+からisoファイルをダウンロードし、ＣＤに書き込んでインストールを
+
+行おうとしたのだが、吐き出されたＣＤが壊れてました。
+
+￥105もしたのに…
+
+という訳で別の方法を。
+
+UNetbootinというものがあるそうで。
+
+[http://unetbootin.sourceforge.net/](http://unetbootin.sourceforge.net/)
+
+これならＣＤを使わずネット経由でインストールできるそうです。
+
+Windows版をインストールし、exeファイルを起動。
+
+選択箇所は２ヶ所。
+
+Distributionで「ubuntu 10.10 Live」を選択し、
+
+インストール先には「HDD Cドライブ」を指定。
+
+インストールは１時間ほどで終了。
+
+再起動。
+
+起動している最中にWindowsを起動するか、ubuntuを起動するか
+
+選択する画面が出てくるので、ubuntuを選択。
+
+5分ほど待つとubuntuのデスクトップがこんにちは。
+
+簡単ですねぇ。
+
+\
+
+次にネット接続。
+
+[http://mamopage.blog65.fc2.com/blog-entry-232.html](http://mamopage.blog65.fc2.com/blog-entry-232.html)
+
+上記サイトを参考にしてＩＰアドレス等を設定すると、ubuntu上部タスクバーに
+
+無線ＬＡＮが検出されるので、当該ＬＡＮを選択し、ＷＥＰキー入力。
+
+以上で無線ＬＡＮを繋げることが出来ました。
+
+\
+ \
+
+が。
+
+"Wireless network connection 'Auto \*\*\*\*' active: \*\*\*(70%)"
+('\*\*\*\*'はSSID)
+
+と表示されているにも関わらずFirefoxのホームページが開けない…。
+
+ルータへのPingも立ちません。
+
+\
+
+iwconfig を見ると"wlan0"で無線と繋がっている様子。
+
+[https://forums.ubuntulinux.jp/viewtopic.php?id=7437](https://forums.ubuntulinux.jp/viewtopic.php?id=7437)
+
+ここを参考にして以下のコマンドを実行するとちゃんと繋がりました。
+
+\$ sudo dhclient wlan0
+
+\
+
+ＩＰアドレス設定の際に
+
+gksudo gedit /etc/network/interfaces
+
+の"auto"等を"eth0"で設定していたのが問題だったのかな？
+
+\
+
+まぁ、何はともあれubuntu生活の第一歩を踏み出せたので一安心。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

@@ -1,0 +1,14 @@
+---
+title:  Object型からLong型への変換
+date: 2011-10-29
+tags: Java
+---
+Object型の変数をString型に変換し、変換したStringをLong型に変換するそうですね。
+
+~~~~ {.syntax-highlight}
+Long l = Long.parseLong(String.valueOf(object));
+~~~~
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

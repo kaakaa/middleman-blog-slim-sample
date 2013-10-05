@@ -1,0 +1,39 @@
+---
+title:  ubuntuを再び再インストール
+date: 2012-01-14
+tags: ubuntu
+---
+昨日できたと思っていたubuntuの再インストールですが、改めて起動してみるとOS選択画面に行く前にfilesystemが見つからないだの言われ、
+
+grub rescue\>
+
+との事。全く分からん。
+
+[Ubuntu日本語フォーラム / パーティションを削除したら grub rescue
+から起動できなくなった](https://forums.ubuntulinux.jp/viewtopic.php?id=9152)
+
+なんだか、windowsからubuntuを削除した時に不具合が起こったらしい。
+
+上記サイトの解決方法試しても駄目、[Super Grub2 Disk - Super Grub
+Disk](http://www.supergrubdisk.org/super-grub2-disk/)こんなん使ってみても駄目…なので、もうHDD初期化してubuntuをクリーンインストールする事にした。
+
+XPはもう良いや。
+
+ubuntuをLiveCDから起動して、HDDの初期化コマンド
+
+dd if=/dev/zero of=/dev/sda bs=512 count=1
+
+[dd if=/dev/zero of=/dev/sda bs=512
+count=1](http://oshiete.goo.ne.jp/qa/4819129.html)
+
+そして、そのままLiveCDからubuntuインストール。
+
+滞りなく終了。
+
+再起動もキチンとできたので、問題はないかと。
+
+ふー。まだまだまだまだ知識が足りないですな。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

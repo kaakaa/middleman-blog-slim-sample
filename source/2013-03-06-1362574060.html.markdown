@@ -1,0 +1,90 @@
+---
+title:  GradleでSpock動かそうとしたらエラー
+date: 2013-03-06
+tags: gradle, spock
+---
+Gradleのバージョン
+
+    ------------------------------------------------------------
+    Gradle 1.0
+    ------------------------------------------------------------
+
+    Gradle build time: 2012年6月12日 0時56分21秒 UTC
+    Groovy: 1.8.6
+    Ant: Apache Ant(TM) version 1.8.2 compiled on December 20 2010
+    Ivy: 2.2.0
+    JVM: 1.7.0_09 (Oracle Corporation 23.5-b02)
+    OS: Mac OS X 10.7.5 x86_64
+
+\
+ \
+
+build.gradle
+
+~~~~ {.syntax-highlight}
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile 'org.yaml:snakeyaml:1.12'
+    groovy 'org.codehaus.groovy:groovy-all:2.0.0'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+}
+~~~~
+
+gradle test したら、以下のエラー。
+
+\
+
+    :compileJava UP-TO-DATE
+    :compileGroovy UP-TO-DATE
+    :processResources UP-TO-DATE
+    :classes UP-TO-DATE
+    :compileTestJava UP-TO-DATE
+    :compileTestGroovy
+
+    FAILURE: Build failed with an exception.
+
+    * What went wrong:
+    Could not resolve all dependencies for configuration ':testCompile'.
+    > Could not find group:junit, module:junit-dep, version:4.10.
+      Required by:
+          :SnakeJenkinsConfig:unspecified > org.spockframework:spock-core:0.7-groovy-2.0
+
+    * Try:
+    Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+    BUILD FAILED
+
+    Total time: 9.204 secs
+
+\
+
+build.gradle を以下のように修正したら、うまくいった。
+
+~~~~ {.syntax-highlight}
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    compile 'org.yaml:snakeyaml:1.12'
+    groovy 'org.codehaus.groovy:groovy-all:2.0.0'
+    testCompile module('org.spockframework:spock-core:0.7-groovy-2.0'){
+        dependency('junit:junit:4.11')
+    }
+}
+~~~~
+
+Gradleのバージョンが古いせいだろうか
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

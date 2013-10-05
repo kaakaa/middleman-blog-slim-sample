@@ -1,0 +1,76 @@
+---
+title:  論理演算子
+date: 2011-10-14
+tags: Ruby
+---
+という訳で、「７つの言語　７つの世界」を使ってRubyの勉強中。
+
+\
+
+今回はRubyに限った話じゃないけど、論理演算子についての基本的な知識。
+
+具体的には&&,||と&,|の違い。
+
+\
+
+「７つの～」によると、&&や||などの記号が二つ続くものは判定結果が明らかになった時点でコンパイラが実行を中止する。&や|のような記号が一つのものはしき全体を実行して比較する。らしい。
+
+例を挙げてみる。
+
+まず、前提としてRubyにおいて引用符で囲まれていない文字は変数として認識され、値が代入されていない変数単体で実行するとエラーとなる。
+
+~~~~ {.syntax-highlight}
+irb(main):001:0> hoge
+NameError: undefined local variable or method `hoge' for main:Object
+        from (irb):1
+        from C:/Ruby192/bin/irb:12:in `<main>'
+~~~~
+
+\
+
+これを用いて
+
+~~~~ {.syntax-highlight}
+irb(main):001:0> false & hoge
+~~~~
+
+~~~~ {.syntax-highlight}
+irb(main):002:0> false && hoge
+~~~~
+
+この２つの論理演算を実行するとどうなるか。
+
+答えはこんな感じ。
+
+~~~~ {.syntax-highlight}
+irb(main):001:0> false & hoge
+NameError: undefined local variable or method `hoge' for main:Object
+        from (irb):1
+        from C:/Ruby192/bin/irb:12:in `<main>'
+~~~~
+
+~~~~ {.syntax-highlight}
+irb(main):002:0> false && hoge
+=> false
+~~~~
+
+一つ目の式では式全体を評価し、hogeという未定義オブジェクトが存在するのでエラーを返している。
+
+二つ目の式では、&&演算においてfalseが出てきているので、その時点でコンパイラはfalseを返して式の評価を終了している。
+
+ここで二つ目の式においてfalseとhogeの順番を入れ替えると、hogeを評価した時点で未定義オブジェクトエラーを返すことになる。
+
+~~~~ {.syntax-highlight}
+irb(main):003:0> hoge && false
+NameError: undefined local variable or method `hoge' for main:Object
+        from (irb):3
+        from C:/Ruby192/bin/irb:12:in `<main>'
+~~~~
+
+\
+
+凄く初歩的な話ですが、備忘録ということで。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

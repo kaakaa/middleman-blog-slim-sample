@@ -1,0 +1,51 @@
+---
+title:  jenkins上でgradle使ってビルドする
+date: 2012-05-23
+tags: gradle,jenkins
+---
+巷で話題（？）のgradle使ってみる。
+
+[Gradle - Build Automation Evolved](http://www.gradle.org/)
+
+ビルドに必要なbuild.gradleファイルは以下。
+
+    apply plugin: 'java'
+
+たったこんだけ。
+
+これを
+
+    gradle build
+
+で動かすと
+
+    $ gradle build
+    :compileJava
+    :processResources UP-TO-DATE
+    :classes
+    :jar
+    :assemble
+    :compileTestJava UP-TO-DATE
+    :processTestResources UP-TO-DATE
+    :testClasses UP-TO-DATE
+    :test
+    :check
+    :build
+
+    BUILD SUCCESSFUL
+
+    Total time: 7.385 secs
+
+ビルドだけでなく、jar作ったりテストまで実行してくれるらしい。
+
+（まだ、しっかりコード組んでないから確認はしてない）
+
+嬉しい。
+
+Jenkins上で動かす時も、gradleプラグイン入れてチェック入れて実行するだけ。
+
+簡単。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

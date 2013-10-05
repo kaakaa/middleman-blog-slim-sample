@@ -1,0 +1,11 @@
+---
+title:  第6回Jenkins勉強会に行ってきた
+date: 2012-10-19
+tags: Jenkins
+---
+[第6回Jenkins勉強会 - 日本語 - Jenkins
+Wiki](https://wiki.jenkins-ci.org/pages/viewpage.action?pageId=64684229)
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

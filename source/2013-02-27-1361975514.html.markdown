@@ -1,0 +1,92 @@
+---
+title:  Panopticodeを動かしてみる
+date: 2013-02-27
+tags: java, metrics
+---
+[![継続的デリバリー
+信頼できるソフトウェアリリースのためのビルド・テスト・デプロイメントの自動化](http://ecx.images-amazon.com/images/I/5119zam7gKL._SL160_.jpg "継続的デリバリー 信頼できるソフトウェアリリースのためのビルド・テスト・デプロイメントの自動化")](http://www.amazon.co.jp/dp/4048707876/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+[継続的デリバリー
+信頼できるソフトウェアリリースのためのビルド・テスト・デプロイメントの自動化](http://www.amazon.co.jp/dp/4048707876/?tag=hatena_st1-22&ascsubtag=d-s2pfr)
+
+-   作者: [David
+    Farley](http://d.hatena.ne.jp/keyword/David%20Farley),[Jez
+    Humble](http://d.hatena.ne.jp/keyword/Jez%20Humble),[和智右桂](http://d.hatena.ne.jp/keyword/%CF%C2%C3%D2%B1%A6%B7%CB),[高木正弘](http://d.hatena.ne.jp/keyword/%B9%E2%CC%DA%C0%B5%B9%B0)
+-   出版社/メーカー:
+    [アスキー・メディアワークス](http://d.hatena.ne.jp/keyword/%A5%A2%A5%B9%A5%AD%A1%BC%A1%A6%A5%E1%A5%C7%A5%A3%A5%A2%A5%EF%A1%BC%A5%AF%A5%B9)
+-   発売日: 2012/03/14
+-   メディア: 大型本
+-   購入: 24人 クリック: 567回
+-   [この商品を含むブログ (48件)
+    を見る](http://d.hatena.ne.jp/asin/4048707876)
+
+を購入したが、読む時間が取れなそうなので、とりあえず見出しだけ流し読してみた。
+
+その中で気になったコードメトリクス可視化ツールPanopticodeを動かしてみようとしたところ、
+
+EMMA実行時に実行時にエラーが出たので、それを残しておく。
+
+\
+
+Panopticodeを動かすのはココらへんを参考に。
+
+[Panopticode -
+不悔必省](http://d.hatena.ne.jp/travelershouse/20080315/1205594341)
+
+[Panopticode | Free Development software downloads at
+SourceForge.net](http://sourceforge.net/projects/panopticode/)
+
+\
+
+実際にAntタスクのmetricsを叩いてみると、以下のエラー。
+
+        [junit] Testcase: testAdd1 took 0.003 sec
+        [junit]     Caused an ERROR
+        [junit] Illegal local variable table length 5 in method org.sample.Sample.<init>()V
+        [junit] java.lang.ClassFormatError: Illegal local variable table length 5 in method org.sample.Sample.<init>()V
+        [junit]     at org.sample.SampleTest.<init>(SampleTest.java:9)
+        [junit]     at java.lang.reflect.Constructor.newInstance(Constructor.java:525)
+        [junit] 
+
+\
+
+探してみると、こんなのが。
+
+[My Blogs : Getting error “Illegal local variable table length 5 in
+method” while running Junit using Java version
+7](http://arihantwin.blogspot.jp/2012/08/getting-error-illegal-local-variable.html)
+
+Java7で起こる問題みたい。
+
+\
+
+panopticode/supplements/emma/emma-imports.xmlの65行目辺りに、
+
+    <jvmarg value="-XX:-UseSplitVerifier" />
+
+を追加。
+
+                <junit fork="yes" forkmode="once" haltonfailure="yes">
+                    <classpath>
+                        <path refid="@{unitTestClasspathId}" />
+                        <fileset dir="@{panopticodeDir}" includes="supplements/emma/lib/*.jar" />
+                    </classpath>
+                    <jvmarg value="-Demma.coverage.out.file=@{outputDir}/scratch/emma/coverage.emma" />
+                    <jvmarg value="-Demma.coverage.out.merge=true" />
+                    <jvmarg value="-XX:-UseSplitVerifier" />
+
+                    <formatter type="plain" usefile="false" />
+                    <formatter type="xml" />
+
+                    <thetests />
+                </junit>
+
+\
+
+したら動いたみたい。
+
+Panopticodeで実際どんなメトリクスを可視化出来るのかは後日。。。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)

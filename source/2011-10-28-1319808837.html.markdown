@@ -1,0 +1,23 @@
+---
+title:  Twitter4j
+date: 2011-10-28
+tags: Java, Twitter
+---
+Twitter4j使ってみようとしてたけど、なんか認証が上手くいかないらしくてAutherizeエラーみたいなのと格闘してた。
+
+\
+
+んで、とりあえず行き着いたのがココ
+
+[ウィリアムのいたずらの開発日記
+Twitter4Jを使って、つぶやきを出力したソース](http://blog.goo.ne.jp/xmldtp/e/edff0e2ede37dc7d335984e647271785)
+
+ツイートの取得だけなら認証要らないのね…。そうだよね。当たり前だよね…。
+
+んでまぁ、結構簡単にツイート取得できました。
+
+次はjQuery使ってamass\_jpのツイートをタグ分けしてHTML吐いてくれるツールでも作ろうかな…。それを自動でアップとかまで出来れば良いけど、サーバー関係は苦手だから途中で諦める感満載。
+
+[![このエントリーをはてなブックマークに追加](http://b.st-hatena.com/images/entry-button/button-only.gif)](http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp "このエントリーをはてなブックマークに追加")
+
+[ツイートする](http://twitter.com/share)
