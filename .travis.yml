@@ -2,3 +2,24 @@ language: ruby
 rvm:
 - 2.0.0
 - 1.9.3
+
+env:
+        global:
+                - GIT_COMMITTER_NAME=kaakaa
+                - GIT_COMMITTER_EMAIL=stooner.hoe@gmail.com
+                - GIT_AUTHOR_NAME=kaakaa
+                - GIT_AUTHOR_EMAIL=stooner.hoe@gmail.com
+                - secure: "PtmLV7gvxQz6TS1mnqIfYyPWgL7V5Xv1ABT1ScDlzu0jKg7kVTI9UNBmSBB8yoqctOi6/IEqpkLHGYMZFLJeu+x5bxQmRT/nHt4r73eHF9gcjPkW/JURtbm9V/qy0FeZ3JmoCvCu2QZFo2kHXWzCfg3AszfrO9gDMFwgpR/gIAw="
+before_script:
+        - git clone --quiet https://github.com/kaakaa/middleman-blog-slim-sample.git build
+        - pushd build
+        - git checkout -b gh-pages
+        - popd
+
+script: bundle exec middleman build
+
+after_success:
+        - cd build
+        - git add -A
+        - git commit -m 'Update'
+        - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages 2> /dev/null'
