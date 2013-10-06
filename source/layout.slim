@@ -16,21 +16,29 @@ html
     .callout.clearfix
       h1 
         | びぼーろく（仮）
+      .grid
+        .col_12
+          ul.tabs.right
+            li
+              a href="tab_blog"
+                i.icon-file
+                | BLOG
+            li
+              a href="tab_socials"
+                i.icon-twitter
+                | SOCIALS
+            li
+              a href="https://github.com/kaakaa/middleman-blog-slim-sample/tree/gh-pages"
+                i.icon-github
+                | View on Gitub
     .grid
       .col_12
-        ul.tabs.left
-          li
-            a href="#tab_blog"
-              | BLOG
-          li
-            a href="#tab_socials"
-              | SOCIALS
-
         == yield
+      hr
       .col_12
         .col_4
           h4 Profile
-          img.align-right src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width"
+          img.align-center src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width"
           p
             | live in Yokohama. Software Engineer. Java / Groovy / Ruby / Sinatra / Trac / Jenkins
         .col_5
@@ -46,3 +54,7 @@ html
               li
                 == link_to year, blog_year_path(year)
                 = "(#{articles.size})"
+    hr
+    .footer
+      p
+        | &copy; Copyright 2013 kaakaa
