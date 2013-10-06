@@ -8,65 +8,41 @@ html
     title KS Sample
     meta chearset="UTF-8"
     meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"
-    link rel="stylesheet" type="text/css" href="css/kickstart.css" media="all"
-    link rel="stylesheet" type="text/css" href="style.css" media="all"
+    link rel="stylesheet" type="text/css" href="/css/kickstart.css" media="all"
+    link rel="stylesheet" type="text/css" href="/style.css" media="all"
     script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"
-    script type="text/javasript" src="javascript/kickstart.js"
-  body
+    script type="text/javasript" src="/javascripts/kickstart.js"
+  body.elements
     .callout.clearfix
       h1 
-        | hoge
+        | びぼーろく（仮）
     .grid
+      .col_12
+        ul.tabs.left
+          li
+            a href="#tab_blog"
+              | BLOG
+          li
+            a href="#tab_socials"
+              | SOCIALS
 
-    .col_12
-      .col_1
-      .col_7
         == yield
-      .col_3
-        h4 Profile
-        img.align-right src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width"
-        p
-          | live in Yokohama. Software Engineer. Java / Groovy / Ruby / Sinatra / Trac / Jenkins
-        h5 Recent Articles
-        ul.alt
-          - blog.articles[0..10].each do |article|
-            li
-              == link_to article.title , article
-        h5 By Year
-        ul.alt
-          - blog.articles.group_by {|a| a.date.year}.each do |year, articles|
-            li
-              == link_to year, blog_year_path(year)
-              = "(#{articles.size})"
-        h5 Tags
-        ul.alt
-          - blog.tags.each do |tag, articles|
-            li
-              == link_to tag, tag_path(tag)
-              = "(#{articles.size})"
-
-        span class="icon social x-large darkgray" data-icon="i"
-        span class="icon social x-large black" data-icon="w"
-        span class="icon x-large pink" data-icon="*"
-        span class="icon social x-large green" data-icon="v"
-
-        h5 Socials
-        p
-          a href="#"
-            i class="icon-twitter-sign icon-2x"
-          a href="#"
-            i class="icon-facebook-sign icon-2x"
-          a href="#"
-            i class="icon-linkedin-sign icon-2x"
-          a href="#"
-            i class="icon-github-sign icon-2x"
-        p
-          a class="button orange small" href="#"
-            i.icon-rss
-            | RSS
-
-        a.twitter-timeline href="https://twitter.com/kaakaa_hoe_prog" data-widget-id="382868831212810240"
-          | @kaakaa_hoe_prog からのツイート
-        script
-          | !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-
+      .col_12
+        .col_4
+          h4 Profile
+          img.align-right src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width"
+          p
+            | live in Yokohama. Software Engineer. Java / Groovy / Ruby / Sinatra / Trac / Jenkins
+        .col_5
+          h5 Recent Articles
+          ul.alt
+            - blog.articles[0..10].each do |article|
+              li
+                == link_to article.title , article
+        .col_3
+          h5 By Year
+          ul.alt
+            - blog.articles.group_by {|a| a.date.year}.each do |year, articles|
+              li
+                == link_to year, blog_year_path(year)
+                = "(#{articles.size})"
