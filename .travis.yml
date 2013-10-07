@@ -1,7 +1,6 @@
 language: ruby
 rvm:
 - 2.0.0
-- 1.9.3
 
 env:
         global:
@@ -23,4 +22,4 @@ after_success:
         - ls
         - git add -A
         - git commit -m 'Update'
-        - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages 2> /dev/null'
+        - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages'
