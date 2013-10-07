@@ -19,7 +19,7 @@ script: bundle exec middleman build
 
 after_success:
         - cd build
-        - ls
+        - git pull origin gh-pages
         - git add -A
         - git commit -m 'Update'
         - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages'
