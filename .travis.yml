@@ -22,5 +22,6 @@ after_success:
         - git add -A
         - git commit -m 'Update'
         - git fetch
-        - git rebase --continue origin/gh-pages
+        - git rebase origin/gh-pages
+        - git-rebase --continue
         - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages'
