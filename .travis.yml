@@ -21,6 +21,7 @@ after_success:
         - cd build
         - git add -A
         - git commit -m 'Update'
+        - git remote remove origin
         - git remote add origin https://github.com/kaakaa/kaakaa.github.io.git
         - git pull origin master
         - '[ "$TRAVIS_BRANCH" == "master" ] && [ $GH_TOKEN ] && git push --quiet -f https://$GH_TOKEN@github.com/kaakaa/middleman-blog-slim-sample.git gh-pages'
