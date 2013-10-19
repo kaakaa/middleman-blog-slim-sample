@@ -1,6 +1,6 @@
 ---
-title:  [Gradle} Gradleﾄｰｷｮｰ　ｻﾝｶｼﾃｷﾀﾖｰ
+title: Gradleﾄｰｷｮｰ　ｻﾝｶｼﾃｷﾀﾖｰ
 date: 2012-07-18
-tags: Groovy
+tags: Groovy, Gradle
 ---
 

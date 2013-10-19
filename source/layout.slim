@@ -11,28 +11,26 @@ html
     link rel="stylesheet" type="text/css" href="/css/kickstart.css" media="all"
     link rel="stylesheet" type="text/css" href="/style.css" media="all"
     script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"
-    script type="text/javasript" src="/javascripts/kickstart.js"
+    script type="text/javascript" src="/javascripts/kickstart.js"
   body.elements
     .callout.clearfix
       h1 
         | びぼーろく（仮）
-      .grid
-        .col_12
-          ul.tabs.right
-            li
-              a href="tab_blog"
-                i.icon-file
-                | BLOG
-            li
-              a href="tab_socials"
-                i.icon-twitter
-                | SOCIALS
-            li
-              a href="https://github.com/kaakaa/middleman-blog-slim-sample/tree/gh-pages"
-                i.icon-github
-                | View on Gitub
     .grid
       .col_12
+        ul.tabs.left
+          li.first.current
+            a href="#tab_blog"
+              i.icon-file
+              | BLOG
+          li
+            a href="#tab_socials"
+              i.icon-twitter
+              | SOCIALS
+          li.last
+            a href="https://github.com/kaakaa/middleman-blog-slim-sample/tree/gh-pages"
+              i.icon-github
+              | View on Gitub
         == yield
       hr
       .col_12
