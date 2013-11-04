@@ -1,0 +1,230 @@
+---
+title: GroovyDSLの実装方法
+date: 2013-10-28
+tags: groovy,dsl
+---
+
+## はじめに
+
+先日、社内の勉強会でUWSCについての発表がありまして、そこでUWSCを使ったテストフレームワークに関する話題が出ました。
+
+テストにするのなら、Groovy使ってDSLっぽく
+
+	test {
+		script {
+			file hoge.uws
+		}
+		assert {
+			assertTitle 'hoge window'
+		}
+	}
+
+みたいに書けたら良いんじゃないとか考えてたら、なんだか実装してみたくなった。
+
+ちょうど翔泳社からクーポンが届いてたので、
+[Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本](http://www.amazon.co.jp/dp/4798125393 "Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本")
+を購入し、GroovyDSLの実装方法について調べたことをまとめてみる。
+
+### staticメソッド
+
+まず最初に見つけた実装方法は、書籍ではなく下記リンクから。  
+[Groovy DSL - A Simple Example | Javalobby](http://java.dzone.com/articles/groovy-dsl-simple-example "Groovy DSL - A Simple Example | Javalobby")
+
+引数ありのメソッド呼び出しの際には"()"を省略出来るというGroovyの特性と、staticメソッドの呼び出し記述を用いて、DSLっぽい記述が出来るようになります。
+
+	// DSL部分
+	Say.hello {
+		to 'foo'
+		from 'bar'
+	}
+	
+	// 実装部分
+	class Say {
+		private String to
+		private String from
+	
+		static void hello(Closure closure) {
+			Say say = new Say()
+			closure.delegate = say
+			closure()
+	
+			say()
+		}
+	
+		def to(String to) {
+			this.to = to
+		}
+	
+		def from(String from) {
+			this.from = from
+		}
+	
+		def say() {
+			println "Hello ${to} from ${from}"
+		}
+	}	
+
+ただ、このやり方だとどうしてもDSL部分にstaticメソッドの親クラスを記述しなくてはいけないのが気になります。
+また、DSL部分と実装部分を同一ファイル内に書くか、実装部分を分離する場合はDSL部分で実装部分をimportしたり同一パッケージに含めたりする必要があります。
+
+### GroovyShell
+
+ここから先は下記書籍を参考に。
+[Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本](http://www.amazon.co.jp/dp/4798125393 "Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本")
+
+[Groovy - Embedding Groovy](http://groovy.codehaus.org/Embedding+Groovy "Groovy - Embedding Groovy")
+
+GroovyShellクラスのevaluateメソッドの引数に文字列を与えると、その文字列をGroovyスクリプトとして実行してくれます。
+
+	new GroovyShell().evaluate("println 'hello world'")
+
+結果
+
+	hello world
+
+このGroovyShellのevaluateメソッドとGroovyのヒアドキュメントを使うと、以下のようにDSL部分と実装部分を分離することが出来ます。
+
+	// DSL部分が記述されたファイルを読み込む
+	def dsl = new File('hoge.dsl').text
+	// 実装部分が記述されたファイルを読み込む
+	def implmentation = new File('fuga.groovy').text
+
+	// ２つのファイルを結合する
+	def script = """
+	${dsl}
+	${implementation}
+	"""
+
+	new GroovyShell().evaluate(script)
+
+これを使って先ほどのSay.helloの例を書き直すと
+
+	// hoge.dsl
+	
+	hello {
+		to 'foo'
+		from 'bat'
+	}
+
+	// fuga.groovy
+	
+	def hello(Closure closure) {
+		Say say = new Say()
+		closure.delegate = say
+		closure()
+	
+		say.say()	
+	}
+	
+	class Say {
+		private String to
+		private String from
+	
+		def to(String to) {
+			this.to = to
+		}
+	
+		def from(String from) {
+			this.from = from
+		}
+	
+		def say(){
+			println "Hello ${to} from ${from}"
+		}
+	}	
+
+helloメソッドでセイセイ言ってるので例がちょっとアレですが、こうすることでstatic呼び出しによる実装方法の場合には書かなくてはいけなかった親クラスの記述がなくなり、DSL部分を多少スッキリさせることが出来ました。  
+また、Groovyスクリプトをevaluateしている部分をメソッド化することで、外部からの呼び出しも簡単になったと思います。
+
+### Java6 Script Engine
+
+前項の実装ではGroovyShellを使ってGroovyスクリプトを評価していましたが、Java6のスクリプトエンジンを使って同様のことが行えます。
+
+	ScriptEngineManager factory = new ScriptEngineManager();
+	ScriptEngine engine = factory.getEngineByName("groovy");
+	engine.eval(new InputStreamReader(
+	  new BufferedInputStream(G
+	    new SequenceInputStream(
+	      new FileInputStream("hoge.dsl"),
+	      new FileInputStream("fuga.groovy")))));
+
+書籍ではJava6スクリプトエンジンの詳細については https://scripting.dev.java.net を参照するようにとの記述がありますが、該当サイトは既に存在しないようです。  
+[Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)](http://www.coderanch.com/t/591196/java/java/scripting-dev-java-net-move "Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)")  
+
+[nickman/javax-scripting](https://github.com/nickman/javax-scripting "nickman/javax-scripting")  
+[Java スクリプトプログラマーズガイド](http://docs.oracle.com/javase/jp/6/technotes/guides/scripting/programmer_guide/ "Java スクリプトプログラマーズガイド")  
+
+### Closure
+
+これまでのGroovyShellやスクリプトエンジンでの実行を行った場合、その実行は呼び出し側とは別のクラスローダーでロードされるという欠点があります。  
+
+既存Javaアプリケーションの拡張としてGroovyDSLを用いる場合、同一クラスローダー上でDSL実装を動作させる手法は下記のようになります。  
+
+	// RunScript.java
+	
+	import groovy.lang.Closure;
+	import groovy.lang.GroovyClassLoader;
+	import groovy.lang.Script;
+	
+	import java.io.File;
+	import java.io.IOException;
+	
+	import org.codehaus.groovy.control.CompilationFailedException;
+	
+	public class RunScript {
+		public void run() throws CompilationFailedException,
+				InstantiationException, IllegalAccessException, IOException {
+			final Closure dsl = (Closure) ((Script) new GroovyClassLoader()
+					.parseClass(new File("say.dsl")).newInstance()).run();
+			
+			final Fuga fuga = new Fuga();
+			
+			dsl.setDelegate(fuga);
+			dsl.call();
+		}
+	}
+
+
+	// Fuga.groovy
+
+	class Say {
+		private String to
+		private String from
+		
+		def to(String to){
+			this.to = to
+		}
+		
+		def from(String from){
+			this.from = from
+		}
+		
+		def say(){
+			println "Hello ${to} from ${from}"
+		}
+	}
+
+	def hello(Closure closure) {
+		Say say = new Say()
+		closure.delegate = say
+		closure()
+		
+		say.say()
+	}
+
+
+	// hoge.dsl
+
+	{ ->
+	hello {
+		to 'foo'
+		from 'bar'
+	}
+	}
+
+Fuga.groovyをコンパイルしておき、DSL部分をGroovyClassLoaderでロードし、クロージャーとして扱います。  
+DSLをクロージャーとして扱うためにhoge.dslの最初と最後にクロージャーを表す中括弧が出現してしまうのが、少し気持ち悪いですね。  
+また、Javaアプリケーションに組み込むにはクロージャーを使えるようにするためにGroovyのjarを読みこませるなどしないといけないようです。  
+（この辺りはJava8のLambdaでなんとか出来たりするのでしょうか…）  
+
+ただ、これにより既存コードと同一のクラスローダ上でDSLを実行できるようになります。  
