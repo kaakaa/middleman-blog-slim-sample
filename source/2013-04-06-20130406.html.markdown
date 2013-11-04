@@ -1,6 +1,0 @@
----
-title:  Sinatraでニコニコカレンダーを作ってみた
-date: 2013-04-06
-tags: Ruby,Sinatra
----
-

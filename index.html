@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      KS Sample
+    </title>
+    <meta chearset="UTF-8" />
+    <meta content="IE=edge;chrome=1" http-equiv="X-UA-Compatible" />
+    <link href="/css/kickstart.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="/style.css" media="all" rel="stylesheet" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+    <script src="/javascripts/kickstart.js" type="text/javascript"></script>
+  </head>
+  <body class="elements">
+    <div class="callout clearfix">
+      <h1>
+        びぼーろく（仮）
+      </h1>
+    </div>
+    <div class="grid">
+      <div class="col_12">
+        <ul class="tabs left">
+          <li class="first current">
+            <a href="#tab_blog"><i class="icon-file"></i>BLOG</a>
+          </li>
+          <li>
+            <a href="#tab_socials"><i class="icon-twitter"></i>SOCIALS</a>
+          </li>
+          <li class="last">
+            <a href="https://github.com/kaakaa/middleman-blog-slim-sample/tree/gh-pages"><i class="icon-github"></i>View on Gitub</a>
+          </li>
+        </ul><div class="tab-content" id="tab_blog" style="display: block;">
+  <span>2013/10/28</span>
+  <h2>
+    <a href="/2013/10/28/dsl1.html">GroovyDSLの実装方法</a>
+  </h2><h2 id="section">はじめに</h2>
+
+<p>先日、社内の勉強会でUWSCについての発表がありまして、そこでUWSCを使ったテストフレームワークに関する話題が出ました。</p>
+
+<p>テストにするのなら、Groovy使ってDSLっぽく</p>
+
+<pre><code>test {
+	script {
+		file hoge.uws
+	}
+	assert {
+		assertTitle 'hoge window'
+	}
+}
+</code></pre>
+
+<p>みたいに書けたら良いんじゃないとか考えてたら、なんだか実装してみたくなった。</p>
+
+<p>ちょうど翔泳社からクーポンが届いてたので、
+<a href="http://www.amazon.co.jp/dp/4798125393" title="Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本">Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本</a>
+を購入し、GroovyDSLの実装方法について調べたことをまとめてみる。</p>
+
+<h3 id="static">staticメソッド</h3>
+
+<p>まず最初に見つけた実装方法は、書籍ではなく下記リンクから。<br />
+<a href="http://java.dzone.com/articles/groovy-dsl-simple-example" title="Groovy DSL - A Simple Example | Javalobby">Groovy DSL - A Simple Example | Javalobby</a></p>
+
+<p>引数ありのメソッド呼び出しの際には"()"を省略出来るというGroovyの特性と、staticメソッドの呼び出し記述を用いて、DSLっぽい記述が出来るようになります。</p>
+
+<pre><code>// DSL部分
+Say.hello {
+	to 'foo'
+	from 'bar'
+}
+
+// 実装部分
+class Say {
+	private String to
+	private String from
+
+	static void hello(Closure closure) {
+		Say say = new Say()
+		closure.delegate = say
+		closure()
+
+		say()
+	}
+
+	def to(String to) {
+		this.to = to
+	}
+
+	def from(String from) {
+		this.from = from
+	}
+
+	def say() {
+		println "Hello ${to} from ${from}"
+	}
+}	
+</code></pre>
+
+<p>ただ、このやり方だとどうしてもDSL部分にstaticメソッドの親クラスを記述しなくてはいけないのが気になります。
+また、DSL部分と実装部分を同一ファイル内に書くか、実装部分を分離する場合はDSL部分で実装部分をimportしたり同一パッケージに含めたりする必要があります。</p>
+
+<h3 id="groovyshell">GroovyShell</h3>
+
+<p>ここから先は下記書籍を参考に。
+<a href="http://www.amazon.co.jp/dp/4798125393" title="Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本">Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本</a></p>
+
+<p><a href="http://groovy.codehaus.org/Embedding+Groovy" title="Groovy - Embedding Groovy">Groovy - Embedding Groovy</a></p>
+
+<p>GroovyShellクラスのevaluateメソッドの引数に文字列を与えると、その文字列をGroovyスクリプトとして実行してくれます。</p>
+
+<pre><code>new GroovyShell().evaluate("println 'hello world'")
+</code></pre>
+
+<p>結果</p>
+
+<pre><code>hello world
+</code></pre>
+
+<p>このGroovyShellのevaluateメソッドとGroovyのヒアドキュメントを使うと、以下のようにDSL部分と実装部分を分離することが出来ます。</p>
+
+<pre><code>// DSL部分が記述されたファイルを読み込む
+def dsl = new File('hoge.dsl').text
+// 実装部分が記述されたファイルを読み込む
+def implmentation = new File('fuga.groovy').text
+
+// ２つのファイルを結合する
+def script = """
+${dsl}
+${implementation}
+"""
+
+new GroovyShell().evaluate(script)
+</code></pre>
+
+<p>これを使って先ほどのSay.helloの例を書き直すと</p>
+
+<pre><code>// hoge.dsl
+
+hello {
+	to 'foo'
+	from 'bat'
+}
+
+// fuga.groovy
+
+def hello(Closure closure) {
+	Say say = new Say()
+	closure.delegate = say
+	closure()
+
+	say.say()	
+}
+
+class Say {
+	private String to
+	private String from
+
+	def to(String to) {
+		this.to = to
+	}
+
+	def from(String from) {
+		this.from = from
+	}
+
+	def say(){
+		println "Hello ${to} from ${from}"
+	}
+}	
+</code></pre>
+
+<p>helloメソッドでセイセイ言ってるので例がちょっとアレですが、こうすることでstatic呼び出しによる実装方法の場合には書かなくてはいけなかった親クラスの記述がなくなり、DSL部分を多少スッキリさせることが出来ました。<br />
+また、Groovyスクリプトをevaluateしている部分をメソッド化することで、外部からの呼び出しも簡単になったと思います。</p>
+
+<h3 id="java6-script-engine">Java6 Script Engine</h3>
+
+<p>前項の実装ではGroovyShellを使ってGroovyスクリプトを評価していましたが、Java6のスクリプトエンジンを使って同様のことが行えます。</p>
+
+<pre><code>ScriptEngineManager factory = new ScriptEngineManager();
+ScriptEngine engine = factory.getEngineByName("groovy");
+engine.eval(new InputStreamReader(
+  new BufferedInputStream(G
+    new SequenceInputStream(
+      new FileInputStream("hoge.dsl"),
+      new FileInputStream("fuga.groovy")))));
+</code></pre>
+
+<p>書籍ではJava6スクリプトエンジンの詳細については https://scripting.dev.java.net を参照するようにとの記述がありますが、該当サイトは既に存在しないようです。<br />
+<a href="http://www.coderanch.com/t/591196/java/java/scripting-dev-java-net-move" title="Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)">Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)</a>  </p>
+
+<p><a href="https://github.com/nickman/javax-scripting" title="nickman/javax-scripting">nickman/javax-scripting</a><br />
+<a href="http://docs.oracle.com/javase/jp/6/technotes/guides/scripting/programmer_guide/" title="Java スクリプトプログラマーズガイド">Java スクリプトプログラマーズガイド</a>  </p>
+
+<h3 id="closure">Closure</h3>
+
+<p>これまでのGroovyShellやスクリプトエンジンでの実行を行った場合、その実行は呼び出し側とは別のクラスローダーでロードされるという欠点があります。  </p>
+
+<p>既存Javaアプリケーションの拡張としてGroovyDSLを用いる場合、同一クラスローダー上でDSL実装を動作させる手法は下記のようになります。  </p>
+
+<pre><code>// RunScript.java
+
+import groovy.lang.Closure;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Script;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.codehaus.groovy.control.CompilationFailedException;
+
+public class RunScript {
+	public void run() throws CompilationFailedException,
+			InstantiationException, IllegalAccessException, IOException {
+		final Closure dsl = (Closure) ((Script) new GroovyClassLoader()
+				.parseClass(new File("say.dsl")).newInstance()).run();
+		
+		final Fuga fuga = new Fuga();
+		
+		dsl.setDelegate(fuga);
+		dsl.call();
+	}
+}
+
+
+// Fuga.groovy
+
+class Say {
+	private String to
+	private String from
+	
+	def to(String to){
+		this.to = to
+	}
+	
+	def from(String from){
+		this.from = from
+	}
+	
+	def say(){
+		println "Hello ${to} from ${from}"
+	}
+}
+
+def hello(Closure closure) {
+	Say say = new Say()
+	closure.delegate = say
+	closure()
+	
+	say.say()
+}
+
+
+// hoge.dsl
+
+{ -&gt;
+hello {
+	to 'foo'
+	from 'bar'
+}
+}
+</code></pre>
+
+<p>Fuga.groovyをコンパイルしておき、DSL部分をGroovyClassLoaderでロードし、クロージャーとして扱います。<br />
+DSLをクロージャーとして扱うためにhoge.dslの最初と最後にクロージャーを表す中括弧が出現してしまうのが、少し気持ち悪いですね。<br />
+また、Javaアプリケーションに組み込むにはクロージャーを使えるようにするためにGroovyのjarを読みこませるなどしないといけないようです。<br />
+（この辺りはJava8のLambdaでなんとか出来たりするのでしょうか…）  </p>
+
+<p>ただ、これにより既存コードと同一のクラスローダ上でDSLを実行できるようになります。  </p>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/10/10</span>
+  <h2>
+    <a href="/2013/10/10/webfrontier_seminar.html">2013年秋 Web開発最前線テックトーク</a>
+  </h2>
+  <h3 id="ruby-on-rails2013">これから始める"Ruby on Rails"2013年秋版</h3>
+  
+  <h5 id="section">開発環境</h5>
+  
+  <ul>
+    <li>MySQL::Sandboxで複数バージョンのインストールができる</li>
+  </ul>
+  
+  <h5 id="section-1">テスト</h5>
+  
+  <ul>
+    <li>現場ではあまりテストは書かれない</li>
+    <li>
+      <p>テストする順番を考える</p>
+    </li>
+    <li>RSpecが主流(model)</li>
+    <li>Request spec(Controller)
+      <ul>
+        <li>RoutingをトレースしたControllerのテスト</li>
+      </ul>
+    </li>
+    <li>Rspec + Capybara + Poltergeist(View)
+      <ul>
+        <li>現状は手作業</li>
+        <li>Capybara 
+          <ul>
+            <li>Webアクセス自動化 + テスト</li>
+            <li>DOMを取得</li>
+          </ul>
+        </li>
+        <li>Poltergeist(Phantomjs)
+          <ul>
+            <li>seleniumの軽量版</li>
+            <li>Capybaraのplugin</li>
+            <li>headlessなのでブラウザを開かずにテストできる</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  
+  <h5 id="gem">便利なgem</h5>
+  
+  <ul>
+    <li>Rails高速化
+      <ul>
+        <li>Springがよく使われていそう</li>
+        <li>実行ファイルをキャッシュして、デーモンとして別プロセスで活かしておく</li>
+        <li>spork/zeus/commands</li>
+      </ul>
+    </li>
+    <li>Rubocop(ロボコップ)
+      <ul>
+        <li>静的解析</li>
+        <li>コーディング規約チェック</li>
+      </ul>
+    </li>
+    <li>TDD
+      <ul>
+        <li>guard/watchrが便利</li>
+      </ul>
+    </li>
+  </ul>
+  
+  <h3 id="nodejs">最近のnode.jsについて</h3>
+  
+  <h5 id="node">Node</h5>
+  
+  <ul>
+    <li>node
+      <ul>
+        <li>sleepやmutexがない。idle</li>
+        <li>ver.偶数メジャーバージョンをインストールする（奇数バージョンはstableじゃない）</li>
+        <li>nodeのサイトにstabilityを調べられる（apiの安定性）
+          <ul>
+            <li>gruntのfs.watch -&gt; stableでない</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>再帰処理は気をつける
+      <ul>
+        <li>再帰処理中はconnectionを受け付けられない</li>
+        <li>他の処理が割り込みできる余地を残しながら回す</li>
+        <li>✕ nextTick ◯ setImmediate</li>
+        <li>nextTick: イベントループ内でネスト的に再帰処理 / setImmediate:１つのイベントを繰り返す</li>
+      </ul>
+    </li>
+    <li>Stream2
+      <ul>
+        <li>dataイベントがある奴は古い</li>
+        <li>readableイベントがある奴は新しい</li>
+      </ul>
+    </li>
+    <li>プロセス管理
+      <ul>
+        <li>initctl + foreman + grunt</li>
+      </ul>
+    </li>
+    <li>node-webkit
+      <ul>
+        <li>node.jsでGUIアプリFW</li>
+      </ul>
+    </li>
+    <li>Haroopad
+      <ul>
+        <li>markdownエディタ</li>
+      </ul>
+    </li>
+    <li>
+      <p>node使えばXHR制約を受けないのでGUIアプリが簡単に作れる</p>
+    </li>
+    <li>Grunt
+      <ul>
+        <li>YAPCのスライドが参考になる</li>
+      </ul>
+    </li>
+    <li>tessel
+      <ul>
+        <li>node.jsが組み込まれたマイコン</li>
+      </ul>
+    </li>
+    <li>大学諸島プログラミングの授業がjavaからjavascriptに変わった
+      <ul>
+        <li>初学者を組み込みやすい</li>
+      </ul>
+    </li>
+    <li>Glideのサーバは
+      <ul>
+        <li>さくら使ってる間はスローダウンさせられてログインできずに落ちてた</li>
+        <li>自宅サーバで動かしてる</li>
+      </ul>
+    </li>
+    <li>process memoryusage
+      <ul>
+        <li>でメモリ使用量が見れる</li>
+      </ul>
+    </li>
+  </ul>
+  
+  <h3 id="scalaweb">ScalaでのWeb開発事情</h3>
+  
+  <ul>
+    <li>gitbucket
+      <ul>
+        <li>Gitlabのインストールがめんどい。メンテする気にならない</li>
+        <li>JGit</li>
+        <li>httpでしかアクセスできない(sshはダメ)</li>
+      </ul>
+    </li>
+    <li>Scalaの利点
+      <ul>
+        <li>安全性 / 柔軟性</li>
+      </ul>
+    </li>
+    <li>Scalaフレームワークの使い分け
+      <ul>
+        <li>Slick (タイプセーフにDSL記述・DB接続)</li>
+        <li>Play2 -&gt; Netty(多重度やスケールアウトに強い) / Scalatra -&gt; Tomcat()</li>
+        <li>SIerはスケールとかいらないのでScalatra(Tomcat)</li>
+      </ul>
+    </li>
+    <li>Play2
+      <ul>
+        <li>ORM微妙(とても微妙/play2.3からはslickが標準に)</li>
+        <li>既存Javaのポーティングに向かない</li>
+        <li>テンプレート/ルーティングもタイプセーフ
+          <ul>
+            <li>テンプレートがタイプセーフなJavaのwebFWはない</li>
+          </ul>
+        </li>
+        <li>ステートレス
+          <ul>
+            <li>セッションの書き換えは変態的な記述が必要</li>
+          </ul>
+        </li>
+        <li>すべてをノンブロッキングで作れる</li>
+        <li>Websocketを簡単に使える</li>
+      </ul>
+    </li>
+    <li>Scalatra
+      <ul>
+        <li>servletAPIを持っているので既存のjavaコードとの移行性も高い</li>
+        <li>play2のタイプセーフなテンプレートエンジンを単体で使える</li>
+      </ul>
+    </li>
+    <li>Slick
+      <ul>
+        <li>タイプセーフなDSL（Lynqみたいなやつ）</li>
+        <li>テーブル定義を簡単にするアノテーションも提供されている</li>
+      </ul>
+    </li>
+    <li>デメリット
+      <ul>
+        <li>コンパイルが遅い
+          <ul>
+            <li>修正だけ差分コンパイルも可能</li>
+            <li>プロジェクトを細かく分ける（コンパイル単位を小さく）</li>
+            <li>依存を脚力減らす（差分コンパイルのために）</li>
+            <li>Scalaコミュニティでも最大の問題として認識されている</li>
+          </ul>
+        </li>
+        <li>バイナリ互換性がない
+          <ul>
+            <li>Scalaをバージョンアップするとバージョンの古いバイナリが動かなくなることがあるA</li>
+          </ul>
+        </li>
+        <li>周辺ツールが未成熟
+          <ul>
+            <li>IntelliJおすすめ
+              <ul>
+                <li>Eclipseのようにホワイトアウトしない</li>
+              </ul>
+            </li>
+            <li>sbtも微妙
+              <ul>
+                <li>キャッシュの挙動がおかしい</li>
+                <li>sbtもあまり互換性がない</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  
+  <h3 id="javascript-">JavaScript フロントエンド開発の昨今</h3>
+  
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/10/ 7</span>
+  <h2>
+    <a href="/2013/10/07/example-article.html">Example Article</a>
+  </h2>
+  <p>This is an example article. You probably want to delete it and write your own articles!</p>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/10/ 6</span>
+  <h2>
+    <a href="/2013/10/06/example-article.html">Example Article</a>
+  </h2>
+  <p>This is an example article. You probably want to delete it and write your own articles!</p>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/10/ 5</span>
+  <h2>
+    <a href="/2013/10/05/example-article.html">Example Article</a>
+  </h2>
+  <p>This is an example article. You probably want to delete it and write your own articles!</p>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/09/24</span>
+  <h2>
+    <a href="/2013/09/24/1380029870.html">Githubリポジトリのデフォルトブランチを変更する</a>
+  </h2>
+  <p>Githubで、master以外のブランチをデフォルトブランチとしてpushしてしまっていた。</p>
+  
+  <p>直そうとしてGitコマンドを色々調べてたけど、Githubのリポジトリのsettingがら変更できるのね…</p>
+  
+  <p><a href="http://superuser.com/questions/294407/cant-remove-remote-branch-in-git">Can’t remove remote branch in git - Super
+  User</a></p>
+  
+  <p><a href="http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" /></a></p>
+  
+  <p><a href="http://twitter.com/share">ツイートする</a></p>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/09/15</span>
+  <h2>
+    <a href="/2013/09/15/20130915.html">Sinatraアプリを定期的に実行するために泥臭く行ってみた</a>
+  </h2>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/09/10</span>
+  <h2>
+    <a href="/2013/09/10/20130910.html">Node.js(Express)でフィードアグリゲータを作り始め</a>
+  </h2>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/09/ 3</span>
+  <h2>
+    <a href="/2013/09/03/20130903.html">SinatraでFeedAggregator</a>
+  </h2>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+  <span>2013/08/19</span>
+  <h2>
+    <a href="/2013/08/19/1376919346.html">社内勉強会 - 書籍管理Webシステム</a>
+  </h2>
+  <p>シコシコ作ってたWebシステムについての紹介。</p>
+  
+  <p>初めてのWebシステムなので、中身はグダグダです。</p>
+  
+  <p><strong><a href="https://www.slideshare.net/nemotoyusuke16/library-slideshare" title="社内勉強会 - 書籍管理Webシステム">社内勉強会 -
+  書籍管理Webシステム</a></strong>
+  from <strong><a href="http://www.slideshare.net/nemotoyusuke16">Nemoto Yusuke</a></strong></p>
+  
+  <p><a href="http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" /></a></p>
+  
+  <p><a href="http://twitter.com/share">ツイートする</a></p>
+  
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'kaakaa';(function() {  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })();
+  </script>
+  <noscript>Please enable JavaScript to view the<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript><a class="dsq-brlink" href="http://disqus.com">comments powered by<span class="logo-disqus">Disqus</span></a>
+  <hr class="alt1" />
+</div>
+<div class="tab-content" id="tab_socials" style="display: none;">
+  <span class="icon social x-large darkgray" data-icon="i"></span><span class="icon social x-large black" data-icon="w"></span><span class="icon x-large pink" data-icon="*"></span><span class="icon social x-large green" data-icon="v"></span>
+  <h5>
+    Socials
+  </h5>
+  <p>
+    <a href="#"><i class="icon-twitter-sign icon-2x"></i></a><a href="#"><i class="icon-facebook-sign icon-2x"></i></a><a href="#"><i class="icon-linkedin-sign icon-2x"></i></a><a href="#"><i class="icon-github-sign icon-2x"></i></a>
+  </p>
+  <p>
+    <a class="button orange small" href="#"><i class="icon-rss">RSS</i></a>
+  </p>
+  <a class="twitter-timeline" data-widget-id="382868831212810240" href="https://twitter.com/kaakaa_hoe_prog">@kaakaa_hoe_prog からのツイート</a>
+  <script>
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  </script>
+</div>
+      </div>
+      <hr />
+      <div class="col_12">
+        <div class="col_4">
+          <h4>
+            Profile
+          </h4>
+          <img class="align-center" src="http://placehold.it/169x130/4D99E0/ffffff.png&text=full+width" />
+          <p>
+            live in Yokohama. Software Engineer. Java / Groovy / Ruby / Sinatra / Trac / Jenkins
+          </p>
+        </div>
+        <div class="col_5">
+          <h5>
+            Recent Articles
+          </h5>
+          <ul class="alt">
+            <li>
+              <a href="/2013/10/28/dsl1.html">GroovyDSLの実装方法</a>
+            </li>
+            <li>
+              <a href="/2013/10/10/webfrontier_seminar.html">2013年秋 Web開発最前線テックトーク</a>
+            </li>
+            <li>
+              <a href="/2013/10/07/example-article.html">Example Article</a>
+            </li>
+            <li>
+              <a href="/2013/10/06/example-article.html">Example Article</a>
+            </li>
+            <li>
+              <a href="/2013/10/05/example-article.html">Example Article</a>
+            </li>
+            <li>
+              <a href="/2013/09/24/1380029870.html">Githubリポジトリのデフォルトブランチを変更する</a>
+            </li>
+            <li>
+              <a href="/2013/09/15/20130915.html">Sinatraアプリを定期的に実行するために泥臭く行ってみた</a>
+            </li>
+            <li>
+              <a href="/2013/09/10/20130910.html">Node.js(Express)でフィードアグリゲータを作り始め</a>
+            </li>
+            <li>
+              <a href="/2013/09/03/20130903.html">SinatraでFeedAggregator</a>
+            </li>
+            <li>
+              <a href="/2013/08/19/1376919346.html">社内勉強会 - 書籍管理Webシステム</a>
+            </li>
+            <li>
+              <a href="/2013/07/18/1374154333.html">Gitbucket1.2で500エラー</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col_3">
+          <h5>
+            By Year
+          </h5>
+          <ul class="alt">
+            <li>
+              <a href="/2013.html">2013</a>(26)
+            </li>
+            <li>
+              <a href="/2012.html">2012</a>(81)
+            </li>
+            <li>
+              <a href="/2011.html">2011</a>(31)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="footer">
+      <p>
+        &copy; Copyright 2013 kaakaa
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,0 @@
----
-title:  SinatraでRSSフィードを表示してみる
-date: 2013-03-29
-tags: Ruby,Sinatra
----
-

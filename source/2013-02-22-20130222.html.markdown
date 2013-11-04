@@ -1,6 +1,0 @@
----
-title:  「第158回 Javaプログラマーに贈る：Groovyで楽
-date: 2013-02-22
-tags: Groovy, clubdb2
----
-

@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Blog Name</title>
+  <subtitle>Blog subtitle</subtitle>
+  <id>http://blog.url.com/</id>
+  <link href="http://blog.url.com/"/>
+  <link href="http://blog.url.com/feed.xml" rel="self"/>
+  <updated>2013-10-28T00:00:00Z</updated>
+  <author>
+    <name>Blog Author</name>
+  </author>
+  <entry>
+    <title>GroovyDSLの実装方法</title>
+    <link rel="alternate" href="http://blog.url.com/2013/10/28/dsl1.html"/>
+    <id>http://blog.url.com/2013/10/28/dsl1.html</id>
+    <published>2013-10-28T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h2 id="section"&gt;はじめに&lt;/h2&gt;
+
+&lt;p&gt;先日、社内の勉強会でUWSCについての発表がありまして、そこでUWSCを使ったテストフレームワークに関する話題が出ました。&lt;/p&gt;
+
+&lt;p&gt;テストにするのなら、Groovy使ってDSLっぽく&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;test {
+	script {
+		file hoge.uws
+	}
+	assert {
+		assertTitle 'hoge window'
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;みたいに書けたら良いんじゃないとか考えてたら、なんだか実装してみたくなった。&lt;/p&gt;
+
+&lt;p&gt;ちょうど翔泳社からクーポンが届いてたので、
+&lt;a href="http://www.amazon.co.jp/dp/4798125393" title="Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本"&gt;Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本&lt;/a&gt;
+を購入し、GroovyDSLの実装方法について調べたことをまとめてみる。&lt;/p&gt;
+
+&lt;h3 id="static"&gt;staticメソッド&lt;/h3&gt;
+
+&lt;p&gt;まず最初に見つけた実装方法は、書籍ではなく下記リンクから。&lt;br /&gt;
+&lt;a href="http://java.dzone.com/articles/groovy-dsl-simple-example" title="Groovy DSL - A Simple Example | Javalobby"&gt;Groovy DSL - A Simple Example | Javalobby&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;引数ありのメソッド呼び出しの際には"()"を省略出来るというGroovyの特性と、staticメソッドの呼び出し記述を用いて、DSLっぽい記述が出来るようになります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// DSL部分
+Say.hello {
+	to 'foo'
+	from 'bar'
+}
+
+// 実装部分
+class Say {
+	private String to
+	private String from
+
+	static void hello(Closure closure) {
+		Say say = new Say()
+		closure.delegate = say
+		closure()
+
+		say()
+	}
+
+	def to(String to) {
+		this.to = to
+	}
+
+	def from(String from) {
+		this.from = from
+	}
+
+	def say() {
+		println "Hello ${to} from ${from}"
+	}
+}	
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ただ、このやり方だとどうしてもDSL部分にstaticメソッドの親クラスを記述しなくてはいけないのが気になります。
+また、DSL部分と実装部分を同一ファイル内に書くか、実装部分を分離する場合はDSL部分で実装部分をimportしたり同一パッケージに含めたりする必要があります。&lt;/p&gt;
+
+&lt;h3 id="groovyshell"&gt;GroovyShell&lt;/h3&gt;
+
+&lt;p&gt;ここから先は下記書籍を参考に。
+&lt;a href="http://www.amazon.co.jp/dp/4798125393" title="Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本"&gt;Amazon.co.jp： 実践プログラミングDSL ドメイン特化言語の設計と実装のノウハウ (Programmer’s SELECTION): Debasish Ghosh, 佐藤 竜一: 本&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://groovy.codehaus.org/Embedding+Groovy" title="Groovy - Embedding Groovy"&gt;Groovy - Embedding Groovy&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;GroovyShellクラスのevaluateメソッドの引数に文字列を与えると、その文字列をGroovyスクリプトとして実行してくれます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;new GroovyShell().evaluate("println 'hello world'")
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;結果&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;hello world
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このGroovyShellのevaluateメソッドとGroovyのヒアドキュメントを使うと、以下のようにDSL部分と実装部分を分離することが出来ます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// DSL部分が記述されたファイルを読み込む
+def dsl = new File('hoge.dsl').text
+// 実装部分が記述されたファイルを読み込む
+def implmentation = new File('fuga.groovy').text
+
+// ２つのファイルを結合する
+def script = """
+${dsl}
+${implementation}
+"""
+
+new GroovyShell().evaluate(script)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これを使って先ほどのSay.helloの例を書き直すと&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// hoge.dsl
+
+hello {
+	to 'foo'
+	from 'bat'
+}
+
+// fuga.groovy
+
+def hello(Closure closure) {
+	Say say = new Say()
+	closure.delegate = say
+	closure()
+
+	say.say()	
+}
+
+class Say {
+	private String to
+	private String from
+
+	def to(String to) {
+		this.to = to
+	}
+
+	def from(String from) {
+		this.from = from
+	}
+
+	def say(){
+		println "Hello ${to} from ${from}"
+	}
+}	
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;helloメソッドでセイセイ言ってるので例がちょっとアレですが、こうすることでstatic呼び出しによる実装方法の場合には書かなくてはいけなかった親クラスの記述がなくなり、DSL部分を多少スッキリさせることが出来ました。&lt;br /&gt;
+また、Groovyスクリプトをevaluateしている部分をメソッド化することで、外部からの呼び出しも簡単になったと思います。&lt;/p&gt;
+
+&lt;h3 id="java6-script-engine"&gt;Java6 Script Engine&lt;/h3&gt;
+
+&lt;p&gt;前項の実装ではGroovyShellを使ってGroovyスクリプトを評価していましたが、Java6のスクリプトエンジンを使って同様のことが行えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ScriptEngineManager factory = new ScriptEngineManager();
+ScriptEngine engine = factory.getEngineByName("groovy");
+engine.eval(new InputStreamReader(
+  new BufferedInputStream(G
+    new SequenceInputStream(
+      new FileInputStream("hoge.dsl"),
+      new FileInputStream("fuga.groovy")))));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;書籍ではJava6スクリプトエンジンの詳細については https://scripting.dev.java.net を参照するようにとの記述がありますが、該当サイトは既に存在しないようです。&lt;br /&gt;
+&lt;a href="http://www.coderanch.com/t/591196/java/java/scripting-dev-java-net-move" title="Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)"&gt;Where did scripting.dev.java.net move to? (Java in General forum at JavaRanch)&lt;/a&gt;  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/nickman/javax-scripting" title="nickman/javax-scripting"&gt;nickman/javax-scripting&lt;/a&gt;&lt;br /&gt;
+&lt;a href="http://docs.oracle.com/javase/jp/6/technotes/guides/scripting/programmer_guide/" title="Java スクリプトプログラマーズガイド"&gt;Java スクリプトプログラマーズガイド&lt;/a&gt;  &lt;/p&gt;
+
+&lt;h3 id="closure"&gt;Closure&lt;/h3&gt;
+
+&lt;p&gt;これまでのGroovyShellやスクリプトエンジンでの実行を行った場合、その実行は呼び出し側とは別のクラスローダーでロードされるという欠点があります。  &lt;/p&gt;
+
+&lt;p&gt;既存Javaアプリケーションの拡張としてGroovyDSLを用いる場合、同一クラスローダー上でDSL実装を動作させる手法は下記のようになります。  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// RunScript.java
+
+import groovy.lang.Closure;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Script;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.codehaus.groovy.control.CompilationFailedException;
+
+public class RunScript {
+	public void run() throws CompilationFailedException,
+			InstantiationException, IllegalAccessException, IOException {
+		final Closure dsl = (Closure) ((Script) new GroovyClassLoader()
+				.parseClass(new File("say.dsl")).newInstance()).run();
+		
+		final Fuga fuga = new Fuga();
+		
+		dsl.setDelegate(fuga);
+		dsl.call();
+	}
+}
+
+
+// Fuga.groovy
+
+class Say {
+	private String to
+	private String from
+	
+	def to(String to){
+		this.to = to
+	}
+	
+	def from(String from){
+		this.from = from
+	}
+	
+	def say(){
+		println "Hello ${to} from ${from}"
+	}
+}
+
+def hello(Closure closure) {
+	Say say = new Say()
+	closure.delegate = say
+	closure()
+	
+	say.say()
+}
+
+
+// hoge.dsl
+
+{ -&amp;gt;
+hello {
+	to 'foo'
+	from 'bar'
+}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Fuga.groovyをコンパイルしておき、DSL部分をGroovyClassLoaderでロードし、クロージャーとして扱います。&lt;br /&gt;
+DSLをクロージャーとして扱うためにhoge.dslの最初と最後にクロージャーを表す中括弧が出現してしまうのが、少し気持ち悪いですね。&lt;br /&gt;
+また、Javaアプリケーションに組み込むにはクロージャーを使えるようにするためにGroovyのjarを読みこませるなどしないといけないようです。&lt;br /&gt;
+（この辺りはJava8のLambdaでなんとか出来たりするのでしょうか…）  &lt;/p&gt;
+
+&lt;p&gt;ただ、これにより既存コードと同一のクラスローダ上でDSLを実行できるようになります。  &lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>2013年秋 Web開発最前線テックトーク</title>
+    <link rel="alternate" href="http://blog.url.com/2013/10/10/webfrontier_seminar.html"/>
+    <id>http://blog.url.com/2013/10/10/webfrontier_seminar.html</id>
+    <published>2013-10-10T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;h3 id="ruby-on-rails2013"&gt;これから始める"Ruby on Rails"2013年秋版&lt;/h3&gt;
+
+&lt;h5 id="section"&gt;開発環境&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;MySQL::Sandboxで複数バージョンのインストールができる&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id="section-1"&gt;テスト&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;現場ではあまりテストは書かれない&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;テストする順番を考える&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;RSpecが主流(model)&lt;/li&gt;
+  &lt;li&gt;Request spec(Controller)
+    &lt;ul&gt;
+      &lt;li&gt;RoutingをトレースしたControllerのテスト&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Rspec + Capybara + Poltergeist(View)
+    &lt;ul&gt;
+      &lt;li&gt;現状は手作業&lt;/li&gt;
+      &lt;li&gt;Capybara 
+        &lt;ul&gt;
+          &lt;li&gt;Webアクセス自動化 + テスト&lt;/li&gt;
+          &lt;li&gt;DOMを取得&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Poltergeist(Phantomjs)
+        &lt;ul&gt;
+          &lt;li&gt;seleniumの軽量版&lt;/li&gt;
+          &lt;li&gt;Capybaraのplugin&lt;/li&gt;
+          &lt;li&gt;headlessなのでブラウザを開かずにテストできる&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id="gem"&gt;便利なgem&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Rails高速化
+    &lt;ul&gt;
+      &lt;li&gt;Springがよく使われていそう&lt;/li&gt;
+      &lt;li&gt;実行ファイルをキャッシュして、デーモンとして別プロセスで活かしておく&lt;/li&gt;
+      &lt;li&gt;spork/zeus/commands&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Rubocop(ロボコップ)
+    &lt;ul&gt;
+      &lt;li&gt;静的解析&lt;/li&gt;
+      &lt;li&gt;コーディング規約チェック&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;TDD
+    &lt;ul&gt;
+      &lt;li&gt;guard/watchrが便利&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="nodejs"&gt;最近のnode.jsについて&lt;/h3&gt;
+
+&lt;h5 id="node"&gt;Node&lt;/h5&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;node
+    &lt;ul&gt;
+      &lt;li&gt;sleepやmutexがない。idle&lt;/li&gt;
+      &lt;li&gt;ver.偶数メジャーバージョンをインストールする（奇数バージョンはstableじゃない）&lt;/li&gt;
+      &lt;li&gt;nodeのサイトにstabilityを調べられる（apiの安定性）
+        &lt;ul&gt;
+          &lt;li&gt;gruntのfs.watch -&amp;gt; stableでない&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;再帰処理は気をつける
+    &lt;ul&gt;
+      &lt;li&gt;再帰処理中はconnectionを受け付けられない&lt;/li&gt;
+      &lt;li&gt;他の処理が割り込みできる余地を残しながら回す&lt;/li&gt;
+      &lt;li&gt;✕ nextTick ◯ setImmediate&lt;/li&gt;
+      &lt;li&gt;nextTick: イベントループ内でネスト的に再帰処理 / setImmediate:１つのイベントを繰り返す&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Stream2
+    &lt;ul&gt;
+      &lt;li&gt;dataイベントがある奴は古い&lt;/li&gt;
+      &lt;li&gt;readableイベントがある奴は新しい&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;プロセス管理
+    &lt;ul&gt;
+      &lt;li&gt;initctl + foreman + grunt&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;node-webkit
+    &lt;ul&gt;
+      &lt;li&gt;node.jsでGUIアプリFW&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Haroopad
+    &lt;ul&gt;
+      &lt;li&gt;markdownエディタ&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;node使えばXHR制約を受けないのでGUIアプリが簡単に作れる&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Grunt
+    &lt;ul&gt;
+      &lt;li&gt;YAPCのスライドが参考になる&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;tessel
+    &lt;ul&gt;
+      &lt;li&gt;node.jsが組み込まれたマイコン&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;大学諸島プログラミングの授業がjavaからjavascriptに変わった
+    &lt;ul&gt;
+      &lt;li&gt;初学者を組み込みやすい&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Glideのサーバは
+    &lt;ul&gt;
+      &lt;li&gt;さくら使ってる間はスローダウンさせられてログインできずに落ちてた&lt;/li&gt;
+      &lt;li&gt;自宅サーバで動かしてる&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;process memoryusage
+    &lt;ul&gt;
+      &lt;li&gt;でメモリ使用量が見れる&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="scalaweb"&gt;ScalaでのWeb開発事情&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;gitbucket
+    &lt;ul&gt;
+      &lt;li&gt;Gitlabのインストールがめんどい。メンテする気にならない&lt;/li&gt;
+      &lt;li&gt;JGit&lt;/li&gt;
+      &lt;li&gt;httpでしかアクセスできない(sshはダメ)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Scalaの利点
+    &lt;ul&gt;
+      &lt;li&gt;安全性 / 柔軟性&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Scalaフレームワークの使い分け
+    &lt;ul&gt;
+      &lt;li&gt;Slick (タイプセーフにDSL記述・DB接続)&lt;/li&gt;
+      &lt;li&gt;Play2 -&amp;gt; Netty(多重度やスケールアウトに強い) / Scalatra -&amp;gt; Tomcat()&lt;/li&gt;
+      &lt;li&gt;SIerはスケールとかいらないのでScalatra(Tomcat)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Play2
+    &lt;ul&gt;
+      &lt;li&gt;ORM微妙(とても微妙/play2.3からはslickが標準に)&lt;/li&gt;
+      &lt;li&gt;既存Javaのポーティングに向かない&lt;/li&gt;
+      &lt;li&gt;テンプレート/ルーティングもタイプセーフ
+        &lt;ul&gt;
+          &lt;li&gt;テンプレートがタイプセーフなJavaのwebFWはない&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;ステートレス
+        &lt;ul&gt;
+          &lt;li&gt;セッションの書き換えは変態的な記述が必要&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;すべてをノンブロッキングで作れる&lt;/li&gt;
+      &lt;li&gt;Websocketを簡単に使える&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Scalatra
+    &lt;ul&gt;
+      &lt;li&gt;servletAPIを持っているので既存のjavaコードとの移行性も高い&lt;/li&gt;
+      &lt;li&gt;play2のタイプセーフなテンプレートエンジンを単体で使える&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Slick
+    &lt;ul&gt;
+      &lt;li&gt;タイプセーフなDSL（Lynqみたいなやつ）&lt;/li&gt;
+      &lt;li&gt;テーブル定義を簡単にするアノテーションも提供されている&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;デメリット
+    &lt;ul&gt;
+      &lt;li&gt;コンパイルが遅い
+        &lt;ul&gt;
+          &lt;li&gt;修正だけ差分コンパイルも可能&lt;/li&gt;
+          &lt;li&gt;プロジェクトを細かく分ける（コンパイル単位を小さく）&lt;/li&gt;
+          &lt;li&gt;依存を脚力減らす（差分コンパイルのために）&lt;/li&gt;
+          &lt;li&gt;Scalaコミュニティでも最大の問題として認識されている&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;バイナリ互換性がない
+        &lt;ul&gt;
+          &lt;li&gt;Scalaをバージョンアップするとバージョンの古いバイナリが動かなくなることがあるA&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;周辺ツールが未成熟
+        &lt;ul&gt;
+          &lt;li&gt;IntelliJおすすめ
+            &lt;ul&gt;
+              &lt;li&gt;Eclipseのようにホワイトアウトしない&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;sbtも微妙
+            &lt;ul&gt;
+              &lt;li&gt;キャッシュの挙動がおかしい&lt;/li&gt;
+              &lt;li&gt;sbtもあまり互換性がない&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id="javascript-"&gt;JavaScript フロントエンド開発の昨今&lt;/h3&gt;
+
+</content>
+  </entry>
+  <entry>
+    <title>Example Article</title>
+    <link rel="alternate" href="http://blog.url.com/2013/10/07/example-article.html"/>
+    <id>http://blog.url.com/2013/10/07/example-article.html</id>
+    <published>2013-10-07T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;This is an example article. You probably want to delete it and write your own articles!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Example Article</title>
+    <link rel="alternate" href="http://blog.url.com/2013/10/06/example-article.html"/>
+    <id>http://blog.url.com/2013/10/06/example-article.html</id>
+    <published>2013-10-06T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;This is an example article. You probably want to delete it and write your own articles!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Example Article</title>
+    <link rel="alternate" href="http://blog.url.com/2013/10/05/example-article.html"/>
+    <id>http://blog.url.com/2013/10/05/example-article.html</id>
+    <published>2013-10-05T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;This is an example article. You probably want to delete it and write your own articles!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Githubリポジトリのデフォルトブランチを変更する</title>
+    <link rel="alternate" href="http://blog.url.com/2013/09/24/1380029870.html"/>
+    <id>http://blog.url.com/2013/09/24/1380029870.html</id>
+    <published>2013-09-24T00:00:00Z</published>
+    <updated>2013-11-04T14:26:38+00:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Githubで、master以外のブランチをデフォルトブランチとしてpushしてしまっていた。&lt;/p&gt;
+
+&lt;p&gt;直そうとしてGitコマンドを色々調べてたけど、Githubのリポジトリのsettingがら変更できるのね…&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://superuser.com/questions/294407/cant-remove-remote-branch-in-git"&gt;Can’t remove remote branch in git - Super
+User&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://b.hatena.ne.jp/entry/http://d.hatena.ne.jp" title="このエントリーをはてなブックマークに追加"&gt;&lt;img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://twitter.com/share"&gt;ツイートする&lt;/a&gt;&lt;/p&gt;
+</content>
+  </entry>
+</feed>

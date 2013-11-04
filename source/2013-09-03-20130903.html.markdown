@@ -1,6 +1,0 @@
----
-title:  SinatraでFeedAggregator
-date: 2013-09-03
-tags: Ruby,Sinatra
----
-

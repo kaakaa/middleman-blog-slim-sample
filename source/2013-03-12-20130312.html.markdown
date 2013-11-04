@@ -1,6 +1,0 @@
----
-title:  GradleとMavenとAnt+ivyの比較
-date: 2013-03-12
-tags: Gradle
----
-
